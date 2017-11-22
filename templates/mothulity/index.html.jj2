@@ -1,0 +1,10 @@
+{% extends "mothulity/base.html.jj2" %}
+{% block title %}
+  Mothulity Index
+{% endblock %}
+{% block content %}
+  <article class="w3-container w3-margin w3-card-8 w3-white">
+    <h1>Hello from mothulity index!</h1>
+    <h2>I say: {{ msg }}</h2>
+  </article>
+{% endblock %}

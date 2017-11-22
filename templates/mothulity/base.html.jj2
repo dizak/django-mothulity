@@ -1,0 +1,20 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href={% static "mothulity/style.css" %}>
+    <title>{% block title %}{% endblock %}</title>
+  </head>
+  <body>
+    <nav>
+      <ul class="w3-navbar w3-xlarge w3-margin w3-card-8 w3-padding-16 w3-black">
+        <li style="width:14%;" class="w3-green"><a href="#">HOME</a></li>
+      </ul>
+    </nav>
+    <section class="w3-container w3-grey">
+      {% block content %}{% endblock %}
+      {% block footer %}Some copyright{% endblock %}
+    </section>
+  </body>
+</html>
