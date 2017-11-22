@@ -1,3 +1,7 @@
 # ignore anything in migrations folder
 
 migrations/*
+
+# ignore pyc files
+
+*pyc
