@@ -7,4 +7,14 @@
     <h1>Hello from mothulity index!</h1>
     <h2>I say: {{ msg }}</h2>
   </article>
+  <article class="w3-container w3-margin w3-card-8 w3-white">
+    <h2>Files upload</h2>
+    <section>
+      <form class="" action="{% url "mothulity:options" %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="file" id="file" multiple>
+        <input type="submit" name="submit" value="Upload">
+      </form>
+    </section>
+  </article>
 {% endblock %}
