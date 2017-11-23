@@ -1,0 +1,9 @@
+{% extends "mothulity/base.html.jj2" %}
+{% block title %}
+  Mothulity Index
+{% endblock %}
+{% block content %}
+  {% for method in methods %}
+    <p>method is {{method}}</p>
+  {% endfor %}
+{% endblock %}
