@@ -2,6 +2,10 @@
 
 migrations/*
 
+# ignore anything in upload folder
+
+upload/*
+
 # ignore pyc files
 
 *pyc
