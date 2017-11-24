@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.conf import settings
 from io import BytesIO
+import os
 from . import views
 
 
@@ -68,3 +69,4 @@ class MultipleFilesFormTest(TestCase):
                                  self.test_file.name)) as fin:
             self.assertIs(int(fin.read()),
                           self.test_content)
+        os.remove("{}/{}".format(self.upload_dir, self.test_file.name))
