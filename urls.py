@@ -5,4 +5,5 @@ from . import views
 app_name = "mothulity"
 
 urlpatterns = [url(r"^$", views.index, name="index"),
-               url(r"^options/$", views.options, name="options")]
+               url(r"^options/$", views.options, name="options"),
+               url(r"^submit/$", views.submit, name="submit")]
