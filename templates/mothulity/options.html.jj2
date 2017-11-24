@@ -3,9 +3,17 @@
   Mothulity Index
 {% endblock %}
 {% block content %}
-  <form class="" action="{% url "mothulity:submit" %}" method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Submit</button>
-  </form>
+  <article class="w3-margin w3-card-8 w3-white">
+    <form class="w3-container" action="{% url "mothulity:submit" %}" method="post">
+      <h2>Parameters to run mothulity:</h2>
+      {% csrf_token %}
+        {% for field in form %}
+          <div class="fieldWrapper">
+            {{ field.label_tag }}
+            {{ field }}
+          </div>
+        {% endfor %}
+      <p><button class="w3-button w3-black" type="submit">Submit</button></p>
+    </form>
+  </article>
 {% endblock %}
