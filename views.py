@@ -14,7 +14,6 @@ def index(request):
                              request.FILES)
         if form.is_valid():
             upld_files = request.FILES.getlist("file_field")
-            print settings.MEDIA_URL
             for upfile in upld_files:
                 utils.write_file(upfile,
                                  settings.MEDIA_URL)
@@ -29,7 +28,6 @@ def index(request):
 
 
 def options(request):
-    print request.method
     if request.method == "POST":
         form = OptionsForm(request.POST)
         if form.is_valid():
