@@ -13,7 +13,7 @@
       <form action="{% url "mothulity:options" %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Submit</button>
+        <p><button class="w3-button w3-black" type="submit">Submit</button></p>
       </form>
     </section>
   </article>
