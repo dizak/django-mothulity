@@ -70,3 +70,23 @@ class MultipleFilesFormTest(TestCase):
             self.assertIs(int(fin.read()),
                           self.test_content)
         os.remove("{}/{}".format(self.upload_dir, self.test_file.name))
+
+
+class OptionsFormTests(TestCase):
+    """
+    Tests for the multi-choice detailed parameters on the options view.
+    """
+    def setUp(self):
+        """
+        Sets up class level attributesfor the OptionsFormTests test.
+        """
+        self.form_data = {"foobar": "test_name",
+                          "notify-email": "joe@test_email"}
+
+    def test_form(self):
+        """
+        Tests whether selecting radio buttons and so works.
+        """
+        response = self.client.post(reverse("mothulity:options"),
+                                    self.form_data)
+        self.assertIs(response.status_code, 200)
