@@ -3,13 +3,9 @@
   Mothulity Index
 {% endblock %}
 {% block content %}
-  <form action="{% url "mothulity:submit" %}" method="post">
+  <form class="" action="{% url "mothulity:submit" %}" method="post">
     {% csrf_token %}
-    <input type="text" name="job-name" value="Name for your job.">
-    <br>
-    <input type="text" name="notify-email" value="e-mail address to notify when the job is done.">
-    <br>
-    <input type="submit" name="submit" value="Submit">
-    <br>
+    {{ form.as_p }}
+    <button type="submit">Submit</button>
   </form>
 {% endblock %}
