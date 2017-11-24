@@ -1,0 +1,14 @@
+{% extends "mothulity/base.html.jj2" %}
+{% block title %}
+  Mothulity - Submit
+{% endblock %}
+{% block content %}
+  <article class="w3-container w3-margin w3-card-8 w3-white">
+    <h1>Submit page</h1>
+  </article>
+  <article class="w3-container w3-margin w3-card-8 w3-white">
+    {% for result in results %}
+      <p>{{result}}</p>
+    {% endfor %}
+  </article>
+{% endblock %}
