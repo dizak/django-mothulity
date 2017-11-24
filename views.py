@@ -32,3 +32,9 @@ def options(request):
     return render(request,
                   "mothulity/options.html.jj2",
                   {"methods": request.method})
+
+
+def submit(request):
+    return render(request,
+                  "mothulity/submit.html.jj2",
+                  {"results": request.POST})
