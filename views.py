@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
-from mothulity.forms import FileFieldForm
+from mothulity.forms import FileFieldForm, OptionsForm
 import utils
 
 # Create your views here.
@@ -29,9 +29,17 @@ def index(request):
 
 
 def options(request):
+    print request.method
+    if request.method == "POST":
+        form = OptionsForm(request.POST)
+        if form.is_valid():
+            return render(request,
+                          "mothulity/submit.html.jj2")
+    else:
+        form = OptionsForm()
     return render(request,
                   "mothulity/options.html.jj2",
-                  {"methods": request.method})
+                  {"form": form})
 
 
 def submit(request):
