@@ -17,6 +17,7 @@ def index(request):
             for upfile in upld_files:
                 utils.write_file(upfile,
                                  settings.MEDIA_URL)
+                utils.chmod_file(upfile)
             return render(request,
                           "mothulity/options.html.jj2",
                           {"methods": request.FILES.getlist("file_field")})
