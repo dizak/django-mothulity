@@ -10,4 +10,5 @@ def write_file(input_file,
 
 def chmod_file(input_file,
                mod=400):
-    os.system("chmod {}".format(mod))
+    os.system("chmod {} {}".format(mod,
+                                   input_file))
