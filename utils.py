@@ -9,5 +9,5 @@ def write_file(input_file,
 
 
 def chmod_file(input_file,
-	           mod=400):
-	os.system("chmod {}".format(mod))
+               mod=400):
+    os.system("chmod {}".format(mod))
