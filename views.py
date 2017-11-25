@@ -20,9 +20,10 @@ def index(request):
                 utils.chmod_file("{}{}".format(settings.MEDIA_URL,
                                                upfile),
                                  mod=666)
+            form = OptionsForm()
             return render(request,
                           "mothulity/options.html.jj2",
-                          {"methods": request.FILES.getlist("file_field")})
+                          {"form": form})
     else:
         form = FileFieldForm()
     return render(request,
