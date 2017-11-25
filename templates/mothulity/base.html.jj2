@@ -19,6 +19,12 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+    input[type=file]:invalid ~ button[type=submit] {
+      display: none;
+    }
+    input[type=file]:valid ~ button[type=submit] {
+      display: block;
+    }
     </style>
     <title>{% block title %}{% endblock %}</title>
   </head>
