@@ -12,8 +12,8 @@
     <section>
       <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form.as_p }}
-        <p><button class="w3-button w3-black" type="submit" onclick=showDiv('UploadSpinner')>Submit</button></p>
+        {{ form }}
+        <button class="w3-button w3-black" type="submit" onclick=showDiv('UploadSpinner')>Submit</button>
       </form>
       <div class="loader" id="UploadSpinner" style="display:none"></div>
     </section>
