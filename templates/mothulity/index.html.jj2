@@ -10,7 +10,7 @@
   <article class="w3-container w3-margin w3-card-8 w3-white">
     <h2>Files upload</h2>
     <section>
-      <form action="{% url "mothulity:options" %}" method="post" enctype="multipart/form-data">
+      <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
         <p><button class="w3-button w3-black" type="submit">Submit</button></p>
