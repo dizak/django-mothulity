@@ -6,6 +6,32 @@ from django.conf import settings
 from io import BytesIO
 import os
 from . import views
+from . import utils
+
+
+class FileSniffTests(TestCase):
+    """
+    Tests for uploaded files validator.
+    """
+    def setUp(self):
+        """
+        Sets up class level attributes for the tests.
+        """
+        fastq_file = "mothulity/tests/Mock_S280_L001_R1_001.fastq"
+        summ_file = "mothulity/tests/mothur.job.trim.contigs.summary"
+        self.fastq_file = "{}/{}".format(settings.BASE_DIR,
+                                         fastq_file)
+        self.summ_file = "{}/{}".format(settings.BASE_DIR,
+                                        summ_file)
+
+    def test_sniff_true(self):
+        """
+        Tests whether utils.sniff returns True on fastq file.
+        """
+        self.assertIs(utils.sniff_file(self.fastq_file), True)
+
+    def test_sniff_false(self):
+        self.assertIs(utils.sniff_file(self.summ_file), False)
 
 
 class ViewsResponseTests(TestCase):
