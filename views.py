@@ -20,6 +20,16 @@ def index(request):
                 utils.chmod_file("{}{}".format(settings.MEDIA_URL,
                                                upfile),
                                  mod=666)
+                if utils.sniff_file("{}{}".format(settings.MEDIA_URL,
+                                                  upfile),
+                                    "fastq") is True:
+                    pass
+                else:
+                    form = FileFieldForm()
+                    return render(request,
+                                  "mothulity/index.html.jj2",
+                                  {"form": form,
+                                   "upload_error": True})
             form = OptionsForm()
             return render(request,
                           "mothulity/options.html.jj2",
