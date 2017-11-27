@@ -16,6 +16,13 @@ class FileSniffTests(TestCase):
     def setUp(self):
         """
         Sets up class level attributes for the tests.
+
+        Parameters
+        -------
+        fastq_file: str
+            Path to test fastq file.
+        summ_file: str
+            Path to test non-fastq file.
         """
         fastq_file = "mothulity/tests/Mock_S280_L001_R1_001.fastq"
         summ_file = "mothulity/tests/mothur.job.trim.contigs.summary"
@@ -26,17 +33,20 @@ class FileSniffTests(TestCase):
 
     def test_sniff_true(self):
         """
-        Tests whether utils.sniff returns True on fastq file.
+        Tests whether utils.sniff returns <True> on fastq file.
         """
         self.assertIs(utils.sniff_file(self.fastq_file), True)
 
     def test_sniff_false(self):
+        """
+        Tests whether utils.sniff returns <False> on fastq file.
+        """
         self.assertIs(utils.sniff_file(self.summ_file), False)
 
 
 class ViewsResponseTests(TestCase):
     """
-    Tests for the index view
+    Tests for the response codes.
     """
     def setUp(self):
         """
@@ -65,7 +75,7 @@ class MultipleFilesFormTest(TestCase):
     """
     def setUp(self):
         """
-        Sets up class level attributes for the MultipleFilesFormTest test.
+        Sets up class level attributes for the tests.
 
         Parameters
         -------
@@ -105,6 +115,11 @@ class OptionsFormTests(TestCase):
     def setUp(self):
         """
         Sets up class level attributesfor the OptionsFormTests test.
+
+        Parameters
+        -------
+        form_data: dict
+            Kwargs for the form that are not default.
         """
         self.form_data = {"foobar": "test_name",
                           "notify-email": "joe@test_email"}
