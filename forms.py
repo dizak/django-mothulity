@@ -65,3 +65,8 @@ class OptionsForm(forms.Form):
                                               widget=forms.
                                               TextInput(attrs={"value": 80,
                                                                "class": input_class}))
+    amplicon_type = forms.ChoiceField(label="Amplicon type.",
+                                      choices=[("16S", "16S"),
+                                               ("ITS", "ITS")],
+                                      widget=forms.
+                                      RadioSelect())
