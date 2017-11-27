@@ -41,19 +41,6 @@ def index(request):
                   {"form": form})
 
 
-def options(request):
-    if request.method == "POST":
-        form = OptionsForm(request.POST)
-        if form.is_valid():
-            return render(request,
-                          "mothulity/submit.html.jj2")
-    else:
-        form = OptionsForm()
-    return render(request,
-                  "mothulity/options.html.jj2",
-                  {"form": form})
-
-
 def submit(request):
     return render(request,
                   "mothulity/submit.html.jj2",
