@@ -44,4 +44,4 @@ def index(request):
 def submit(request):
     return render(request,
                   "mothulity/submit.html.jj2",
-                  {"results": request.POST})
+                  {"notify_email": request.POST["notify_email"]})

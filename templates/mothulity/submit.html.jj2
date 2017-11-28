@@ -4,11 +4,9 @@
 {% endblock %}
 {% block content %}
   <article class="w3-container w3-margin w3-card-8 w3-white">
-    <h1>Submit page</h1>
+    <h1>Thank you, your data has been submitted!</h1>
   </article>
   <article class="w3-container w3-margin w3-card-8 w3-white">
-    {% for result in results %}
-      <p>{{result}}</p>
-    {% endfor %}
+    <p>You will be notified to {{ notify_email}} when the job is done. Please be patient, it can take up to 2 weeks.</p>
   </article>
 {% endblock %}
