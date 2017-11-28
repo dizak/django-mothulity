@@ -5,8 +5,8 @@ from django.urls import reverse
 from django.conf import settings
 from io import BytesIO
 import os
-from . import views
-from . import utils
+import uuid
+from mothulity import views, models, utils
 
 
 class FileSniffTests(TestCase):
@@ -67,6 +67,31 @@ class ViewsResponseTests(TestCase):
         for url in self.urls_list:
             response = self.client.get(reverse("mothulity:{}".format(url)))
             self.assertIs(response.status_code, 200)
+
+
+class ModelsTest(TestCase):
+    """
+    Tests for the models database API.
+    """
+    def setUp(self):
+        """
+        Sets up class level attrubutes for the tests.
+
+        Parameters
+        -------
+        test_job_id: str
+            UUID created ad hoc and converted into str.
+        """
+        self.test_job_id = str(uuid.uuid4())
+
+    def test_job_id(self):
+        """
+        Tests whether job_id is properly saved and retrieved into and from the\
+        model.
+        """
+        j_id = models.JobID(job_id=self.test_job_id)
+        j_id.save()
+        self.assertIs(j_id.job_id, self.test_job_id)
 
 
 class MultipleFilesFormTest(TestCase):
