@@ -4,6 +4,7 @@ from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from mothulity.forms import FileFieldForm, OptionsForm
 import utils
+import uuid
 
 # Create your views here.
 
@@ -42,6 +43,10 @@ def index(request):
 
 
 def submit(request):
+    job_id = uuid.uuid4()
+    job_id_link = "{}{}".format(request.build_absolute_uri(),
+                              job_id)
     return render(request,
                   "mothulity/submit.html.jj2",
-                  {"notify_email": request.POST["notify_email"]})
+                  {"notify_email": request.POST["notify_email"],
+                   "job_id_link": job_id_link})
