@@ -17,12 +17,12 @@ class OptionsForm(forms.Form):
                                widget=forms.
                                TextInput(attrs={"value": "",
                                                 "class": input_class}))
-    notify_email = forms.CharField(label="e-mail address on which you will be\
-                                   notified",
-                                   max_length=40,
-                                   widget=forms.
-                                   TextInput(attrs={"value": "",
-                                                    "class": input_class}))
+    notify_email = forms.EmailField(label="e-mail address on which you will be\
+                                    notified",
+                                    max_length=40,
+                                    widget=forms.
+                                    EmailInput(attrs={"value": "",
+                                                      "class": input_class}))
     max_ambig = forms.IntegerField(label="Maximum number of ambiguous bases\
                                    allowed.",
                                    widget=forms.
