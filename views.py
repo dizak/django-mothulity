@@ -54,7 +54,7 @@ def index(request):
 
 def submit(request,
            job):
-    job = JobID.objects.get(job_id=job)
+    job = get_object_or_404(JobID, job_id=job)
     sub_data = job.submissiondata_set.create(job_name=request.POST["job_name"],
                                              notify_email=request.POST["notify_email"],
                                              max_ambig=request.POST["max_ambig"],
