@@ -18,7 +18,7 @@ def index(request):
         if form.is_valid():
             job_id = uuid.uuid4()
             upld_dir = "{}{}/".format(settings.MEDIA_URL,
-                                     job_id)
+                                      job_id)
             os.system("mkdir {}".format(upld_dir))
             upld_files = request.FILES.getlist("file_field")
             for upfile in upld_files:
