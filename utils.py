@@ -61,42 +61,29 @@ def sniff_file(input_file,
         return False
 
 
-def render_moth_cmd(mothu_exec="mothulity.py",
-                    input_files=None,
-                    job_name=None,
-                    notify_email=None,
-                    max_ambig=None,
-                    max_homop=None,
-                    min_length=None,
-                    max_length=None,
-                    min_overlap=None,
-                    screen_criteria=None,
-                    chop_length=None,
-                    precluster_diffs=None,
-                    classify_seqs_cutoff=None,
-                    amplicon_type=None):
-    return "{} {} --job-name {}\
-                  --notify-email {}\
-                  --max-ambig {}\
-                  --max-homop {}\
-                  --min-length {}\
-                  --max-length {}\
-                  --min-overlap {}\
-                  --screen-criteria {}\
-                  --chop-length {}\
-                  --precluster-diffs {}\
-                  --classify-seqs-cutoff {}\
-                  --amplicon-type {}".format(mothu_exec,
-                                             input_files,
-                                             job_name,
-                                             notify_email,
-                                             max_ambig,
-                                             max_homop,
-                                             min_length,
-                                             max_length,
-                                             min_overlap,
-                                             screen_criteria,
-                                             chop_length,
-                                             precluster_diffs,
-                                             classify_seqs_cutoff,
-                                             amplicon_type)
+def render_moth_cmd(moth_exec="mothulity.py",
+                    moth_files=None,
+                    moth_options=None):
+    """
+    Returns ready-to-go CLI command for mothulity from dict
+
+    Parameters
+    -------
+    moth_exec: str, default <mothulity.py>
+        Mothulity executable.
+    moth_files: str, default <None>
+        path/to/input/files.
+    moth_options: dict
+        Dict of kvals converted to POSIX CLI optional arguments.
+
+    Returns
+    -------
+    str
+        POSIX mothulity command.
+    """
+    moth_opt_zip = zip(moth_options.keys(),
+                       moth_options.values())
+    moth_opt_str = " ".join(["--{} {}".format(k, v) for k, v in moth_opt_zip])
+    return "{} {} {}".format(moth_exec,
+                             moth_files,
+                             moth_opt_str)
