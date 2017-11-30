@@ -59,3 +59,44 @@ def sniff_file(input_file,
             return True
     except Exception as e:
         return False
+
+
+def render_moth_cmd(mothu_exec="mothulity.py",
+                    input_files=None,
+                    job_name=None,
+                    notify_email=None,
+                    max_ambig=None,
+                    max_homop=None,
+                    min_length=None,
+                    max_length=None,
+                    min_overlap=None,
+                    screen_criteria=None,
+                    chop_length=None,
+                    precluster_diffs=None,
+                    classify_seqs_cutoff=None,
+                    amplicon_type=None):
+    return "{} {} --job-name {}\
+                  --notify-email {}\
+                  --max-ambig {}\
+                  --max-homop {}\
+                  --min-length {}\
+                  --max-length {}\
+                  --min-overlap {}\
+                  --screen-criteria {}\
+                  --chop-length {}\
+                  --precluster-diffs {}\
+                  --classify-seqs-cutoff {}\
+                  --amplicon-type {}".format(mothu_exec,
+                                             input_files,
+                                             job_name,
+                                             notify_email,
+                                             max_ambig,
+                                             max_homop,
+                                             min_length,
+                                             max_length,
+                                             min_overlap,
+                                             screen_criteria,
+                                             chop_length,
+                                             precluster_diffs,
+                                             classify_seqs_cutoff,
+                                             amplicon_type)
