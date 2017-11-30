@@ -5,4 +5,4 @@ from . import views
 app_name = "mothulity"
 
 urlpatterns = [url(r"^$", views.index, name="index"),
-               url(r"^submit/$", views.submit, name="submit")]
+               url(r"^submit/(?P<job>.+)$", views.submit, name="submit")]
