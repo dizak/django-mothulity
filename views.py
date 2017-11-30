@@ -6,6 +6,7 @@ from mothulity.forms import FileFieldForm, OptionsForm
 from mothulity.models import JobID, SubmissionData
 import utils
 import uuid
+import os
 
 # Create your views here.
 
@@ -15,18 +16,24 @@ def index(request):
         form = FileFieldForm(request.POST,
                              request.FILES)
         if form.is_valid():
+            job_id = uuid.uuid4()
+            upld_dir = "{}{}/".format(settings.MEDIA_URL,
+                                     job_id)
+            os.system("mkdir {}".format(upld_dir))
             upld_files = request.FILES.getlist("file_field")
             for upfile in upld_files:
                 utils.write_file(upfile,
-                                 settings.MEDIA_URL)
-                utils.chmod_file("{}{}".format(settings.MEDIA_URL,
+                                 upld_dir)
+                utils.chmod_file("{}{}".format(upld_dir,
                                                upfile),
                                  mod=666)
-                if utils.sniff_file("{}{}".format(settings.MEDIA_URL,
+                if utils.sniff_file("{}{}".format(upld_dir,
                                                   upfile),
                                     "fastq") is True:
-                    pass
+                    job = Job(job_id=job_id)
+                    job.save()
                 else:
+                    os.system("rm -r {}".format(upld_dir))
                     form = FileFieldForm()
                     return render(request,
                                   "mothulity/index.html.jj2",
