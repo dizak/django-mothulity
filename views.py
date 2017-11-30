@@ -86,3 +86,11 @@ def submit(request,
                   {"notify_email": request.POST["notify_email"],
                    "job_id": job.job_id,
                    "moth_cmd": moth_cmd})
+
+
+def status(request,
+           job):
+    job = get_object_or_404(JobID, job_id=job)
+    return render(request,
+                  "mothulity/status.html.jj2",
+                  {"job_id": job.job_id})
