@@ -30,8 +30,7 @@ def index(request):
                 if utils.sniff_file("{}{}".format(upld_dir,
                                                   upfile),
                                     "fastq") is True:
-                    job = Job(job_id=job_id)
-                    job.save()
+                    pass
                 else:
                     os.system("rm -r {}".format(upld_dir))
                     form = FileFieldForm()
@@ -39,10 +38,13 @@ def index(request):
                                   "mothulity/index.html.jj2",
                                   {"form": form,
                                    "upload_error": True})
+            job = JobID(job_id=job_id)
+            job.save()
             form = OptionsForm()
             return render(request,
                           "mothulity/options.html.jj2",
-                          {"form": form})
+                          {"form": form,
+                           "job": job_id})
     else:
         form = FileFieldForm()
     return render(request,
@@ -50,12 +52,9 @@ def index(request):
                   {"form": form})
 
 
-def submit(request):
-    job_id = uuid.uuid4()
-    job_id_link = "{}{}".format(request.build_absolute_uri(),
-                                job_id)
-    job = JobID(job_id=job_id)
-    job.save()
+def submit(request,
+           job):
+    job = JobID.objects.get(job_id=job)
     sub_data = job.submissiondata_set.create(job_name=request.POST["job_name"],
                                              notify_email=request.POST["notify_email"],
                                              max_ambig=request.POST["max_ambig"],
@@ -68,21 +67,22 @@ def submit(request):
                                              precluster_diffs=request.POST["precluster_diffs"],
                                              classify_seqs_cutoff=request.POST["classify_seqs_cutoff"],
                                              amplicon_type=request.POST["amplicon_type"])
-    moth_cmd_dict = {"job_name": sub_data.job_name,
-                     "notify_email": sub_data.notify_email,
-                     "max_ambig": sub_data.max_ambig,
-                     "max_homop": sub_data.max_homop,
-                     "min_length": sub_data.min_length,
-                     "max_length": sub_data.max_length,
-                     "min_overlap": sub_data.min_overlap,
-                     "screen_criteria": sub_data.screen_criteria,
-                     "chop_length": sub_data.chop_length,
-                     "precluster_diffs": sub_data.chop_length,
-                     "classify_seqs_cutoff": sub_data.classify_seqs_cutoff,
-                     "amplicon_type": sub_data.amplicon_type}
+    moth_cmd_dict = {"job-name": sub_data.job_name,
+                     "notify-email": sub_data.notify_email,
+                     "max-ambig": sub_data.max_ambig,
+                     "max-homop": sub_data.max_homop,
+                     "min-length": sub_data.min_length,
+                     "max-length": sub_data.max_length,
+                     "min-overlap": sub_data.min_overlap,
+                     "screen-criteria": sub_data.screen_criteria,
+                     "chop-length": sub_data.chop_length,
+                     "precluster-diffs": sub_data.chop_length,
+                     "classify-seqs-cutoff": sub_data.classify_seqs_cutoff,
+                     "amplicon-type": sub_data.amplicon_type}
     moth_cmd = utils.render_moth_cmd(moth_options=moth_cmd_dict)
+    job_id_link = "".format(job.job_id)
     return render(request,
                   "mothulity/submit.html.jj2",
                   {"notify_email": request.POST["notify_email"],
-                   "job_id_link": job_id_link,
+                   "job_id": job.job_id,
                    "moth_cmd": moth_cmd})
