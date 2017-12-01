@@ -1,5 +1,6 @@
 import os
-from skbio.io import sniff
+from glob import glob
+from skbio.io import sniff, read
 
 
 def write_file(input_file,
@@ -59,6 +60,16 @@ def sniff_file(input_file,
             return True
     except Exception as e:
         return False
+
+
+def count_seqs(input_files,
+               file_format="fastq",
+               phred_offset=33):
+    input_glob = glob(input_files)
+    seqs = [read(i,
+                 file_format,
+                 phred_offset=phred_offset) for i in input_glob]
+    return sum([len(list(i)) for i in seqs])
 
 
 def render_moth_cmd(moth_exec="mothulity.py",
