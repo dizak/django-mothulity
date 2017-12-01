@@ -11,7 +11,8 @@ import os
 # Create your views here.
 
 
-def index(request):
+def index(request,
+          seqs_limit=3000):
     if request.method == "POST":
         form = FileFieldForm(request.POST,
                              request.FILES)
@@ -38,6 +39,16 @@ def index(request):
                                   "mothulity/index.html.jj2",
                                   {"form": form,
                                    "upload_error": True})
+            seqs_count = utils.count_seqs("{}*fastq".format(upld_dir))
+            if seqs_count > seqs_limit:
+                os.system("rm -r {}".format(upld_dir))
+                form = FileFieldForm()
+                return render(request,
+                              "mothulity/index.html.jj2",
+                              {"form": form,
+                               "too_many_error": True,
+                               "seqs_count": seqs_count,
+                               "seqs_limit": seqs_limit})
             job = JobID(job_id=job_id)
             job.save()
             form = OptionsForm()
