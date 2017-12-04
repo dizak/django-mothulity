@@ -12,7 +12,7 @@ import os
 
 
 def index(request,
-          seqs_limit=3000):
+          seqs_limit=5000000):
     if request.method == "POST":
         form = FileFieldForm(request.POST,
                              request.FILES)
