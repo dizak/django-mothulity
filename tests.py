@@ -30,6 +30,7 @@ class UtilsTests(TestCase):
                                          fastq_file)
         self.summ_file = "{}/{}".format(settings.BASE_DIR,
                                         summ_file)
+        self.mock_md5sum = "7e4f54362bd0f030a623a6aaba27ddba"
 
     def test_sniff_true(self):
         """
@@ -45,6 +46,10 @@ class UtilsTests(TestCase):
 
     def test_count_seqs(self):
         self.assertEqual(utils.count_seqs(self.fastq_file), 4779)
+
+    def test_md5sum(self):
+        self.assertEqual(utils.md5sum(self.fastq_file),
+                         self.mock_md5sum)
 
 
 class ViewsResponseTests(TestCase):

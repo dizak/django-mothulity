@@ -1,5 +1,6 @@
 import os
 from glob import glob
+import subprocess as sp
 from skbio.io import sniff
 import Bio.SeqIO as sio
 
@@ -36,6 +37,25 @@ def chmod_file(input_file,
     """
     os.system("chmod {} {}".format(mod,
                                    input_file))
+
+
+def md5sum(input_file):
+    """
+    Generates md5sum of a file usign linux system command.
+
+    Parameters
+    -------
+    input_file: str
+        Path to input file.
+
+    Returns
+    -------
+    str
+        md5sum.
+    """
+    md5_output = sp.check_output("md5sum {}".format(input_file),
+                                 shell=True)
+    return str(md5_output.split(" ")[0])
 
 
 def sniff_file(input_file,
