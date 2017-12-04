@@ -1,6 +1,7 @@
 import os
 from glob import glob
-from skbio.io import sniff, read
+from skbio.io import sniff
+import Bio.SeqIO as sio
 
 
 def write_file(input_file,
@@ -63,12 +64,10 @@ def sniff_file(input_file,
 
 
 def count_seqs(input_files,
-               file_format="fastq",
-               phred_offset=33):
+               file_format="fastq"):
     input_glob = glob(input_files)
-    seqs = [read(i,
-                 file_format,
-                 phred_offset=phred_offset) for i in input_glob]
+    seqs = [sio.parse(i,
+                      file_format) for i in input_glob]
     return sum([len(list(i)) for i in seqs])
 
 

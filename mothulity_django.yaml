@@ -11,6 +11,7 @@ dependencies:
 - backports.functools_lru_cache=1.4=py27_1
 - backports.shutil_get_terminal_size=1.0.0=py_3
 - backports_abc=0.5=py27_0
+- biopython=1.70=py27_2
 - ca-certificates=2017.11.5=0
 - certifi=2017.11.5=py27_0
 - cffi=1.11.2=py27_0
@@ -107,5 +108,5 @@ dependencies:
   - backports.ssl-match-hostname==3.5.0.1
   - ipython-genutils==0.2.0
   - prompt-toolkit==1.0.15
-prefix: /home/dizak/anaconda2/envs/django_v1.11
+prefix: /home/dizak/anaconda2/envs/mothulity_django
 

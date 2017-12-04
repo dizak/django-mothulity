@@ -9,7 +9,7 @@ import uuid
 from mothulity import views, models, utils
 
 
-class FileSniffTests(TestCase):
+class UtilsTests(TestCase):
     """
     Tests for uploaded files validator.
     """
@@ -42,6 +42,9 @@ class FileSniffTests(TestCase):
         Tests whether utils.sniff returns <False> on fastq file.
         """
         self.assertIs(utils.sniff_file(self.summ_file), False)
+
+    def test_count_seqs(self):
+        self.assertEqual(utils.count_seqs(self.fastq_file), 4779)
 
 
 class ViewsResponseTests(TestCase):
