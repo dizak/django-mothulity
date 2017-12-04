@@ -94,7 +94,7 @@ def submit(request,
                      "min-overlap": sub_data.min_overlap,
                      "screen-criteria": sub_data.screen_criteria,
                      "chop-length": sub_data.chop_length,
-                     "precluster-diffs": sub_data.chop_length,
+                     "precluster-diffs": sub_data.precluster_diffs,
                      "classify-seqs-cutoff": sub_data.classify_seqs_cutoff}
     if seqs_count > 500000:
         moth_cmd_dict["resources"] = "phi"
