@@ -85,6 +85,7 @@ class ModelsTest(TestCase):
             UUID created ad hoc and converted into str.
         """
         self.test_job_id = str(uuid.uuid4())
+        self.test_seqs_count = 17
 
     def test_job_id(self):
         """
@@ -94,3 +95,9 @@ class ModelsTest(TestCase):
         j_id = models.JobID(job_id=self.test_job_id)
         j_id.save()
         self.assertIs(j_id.job_id, self.test_job_id)
+
+    def test_seqsstats(self):
+        j_id = models.JobID(job_id=self.test_job_id)
+        j_id.save()
+        stats = j_id.seqsstats_set.create(seqs_count=self.test_seqs_count)
+        self.assertIs(stats.seqs_count, self.test_seqs_count)

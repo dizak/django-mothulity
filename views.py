@@ -12,7 +12,7 @@ import os
 
 
 def index(request,
-          seqs_limit=5000000):
+          seqs_limit=900000):
     if request.method == "POST":
         form = FileFieldForm(request.POST,
                              request.FILES)
@@ -51,6 +51,7 @@ def index(request,
                                "seqs_limit": seqs_limit})
             job = JobID(job_id=job_id)
             job.save()
+            seqs_stats = job.seqsstats_set.create(seqs_count=seqs_count)
             form = OptionsForm()
             return render(request,
                           "mothulity/options.html.jj2",
@@ -66,6 +67,7 @@ def index(request,
 def submit(request,
            job):
     job = get_object_or_404(JobID, job_id=job)
+    seqs_count = job.seqsstats_set.values()[0]["seqs_count"]
     sub_data = job.submissiondata_set.create(job_name=request.POST["job_name"],
                                              notify_email=request.POST["notify_email"],
                                              max_ambig=request.POST["max_ambig"],
@@ -90,7 +92,13 @@ def submit(request,
                      "precluster-diffs": sub_data.chop_length,
                      "classify-seqs-cutoff": sub_data.classify_seqs_cutoff,
                      "amplicon-type": sub_data.amplicon_type}
-    moth_cmd = utils.render_moth_cmd(moth_options=moth_cmd_dict)
+    if seqs_count > 500000:
+        moth_cmd_dict["resources"] = "phi"
+    else:
+        moth_cmd_dict["resources"] = "s"
+    moth_cmd = utils.render_moth_cmd(moth_files="{}{}".format(settings.HEADNODE_PREFIX_URL,
+                                                              job.job_id),
+                                     moth_options=moth_cmd_dict)
     job_id_link = "".format(job.job_id)
     return render(request,
                   "mothulity/submit.html.jj2",

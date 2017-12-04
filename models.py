@@ -13,6 +13,15 @@ class JobID(models.Model):
         return self.job_id
 
 
+class SeqsStats(models.Model):
+    job_id = models.ForeignKey(JobID,
+                               on_delete=models.CASCADE)
+    seqs_count = models.IntegerField()
+
+    def __int__(self):
+        return self.seqs_count
+
+
 class SubmissionData(models.Model):
     job_id = models.ForeignKey(JobID,
                                on_delete=models.CASCADE)
