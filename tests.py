@@ -26,10 +26,13 @@ class UtilsTests(TestCase):
         """
         fastq_file = "mothulity/tests/Mock_S280_L001_R1_001.fastq"
         summ_file = "mothulity/tests/mothur.job.trim.contigs.summary"
+        self.remote_machine="headnode"
+        self.fastq_file_remote = "/home/dizak/misc/mothulity_django_tests/Mock_S280_L001_R1_001.fastq"
         self.fastq_file = "{}/{}".format(settings.BASE_DIR,
                                          fastq_file)
         self.summ_file = "{}/{}".format(settings.BASE_DIR,
                                         summ_file)
+        self.mock_md5sum = "7e4f54362bd0f030a623a6aaba27ddba"
 
     def test_sniff_true(self):
         """
@@ -45,6 +48,16 @@ class UtilsTests(TestCase):
 
     def test_count_seqs(self):
         self.assertEqual(utils.count_seqs(self.fastq_file), 4779)
+
+    def test_md5sum(self):
+        self.assertEqual(utils.md5sum(self.fastq_file),
+                         self.mock_md5sum)
+
+    def test_md5sum_remote(self):
+        self.assertEqual(utils.md5sum(self.fastq_file_remote,
+                                      remote=True,
+                                      machine=self.remote_machine),
+                         self.mock_md5sum)
 
 
 class ViewsResponseTests(TestCase):
