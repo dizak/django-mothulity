@@ -39,7 +39,9 @@ def chmod_file(input_file,
                                    input_file))
 
 
-def md5sum(input_file):
+def md5sum(input_file,
+           remote=False,
+           machine="headnode"):
     """
     Generates md5sum of a file usign linux system command.
 
@@ -47,14 +49,22 @@ def md5sum(input_file):
     -------
     input_file: str
         Path to input file.
-
+    remote: bool, default <False>
+        When <True>, uses ssh to check md5sum on remote machine.
+    machine: str
+        Name of the machine to call md5sum on when remote set to <True>.
     Returns
     -------
     str
         md5sum.
     """
-    md5_output = sp.check_output("md5sum {}".format(input_file),
-                                 shell=True)
+    if remote is True:
+        md5_output = sp.check_output("ssh {} md5sum {}".format(machine,
+                                                               input_file),
+                                     shell=True)
+    else:
+        md5_output = sp.check_output("md5sum {}".format(input_file),
+                                     shell=True)
     return str(md5_output.split(" ")[0])
 
 
