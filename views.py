@@ -68,6 +68,9 @@ def submit(request,
            job):
     job = get_object_or_404(JobID, job_id=job)
     seqs_count = job.seqsstats_set.values()[0]["seqs_count"]
+    upld_dir = "{}{}".format(settings.MEDIA_URL, job.job_id)
+    headnode_dir = "{}{}".format(settings.HEADNODE_PREFIX_URL,
+                                 job.job_id)
     sub_data = job.submissiondata_set.create(job_name=request.POST["job_name"],
                                              notify_email=request.POST["notify_email"],
                                              max_ambig=request.POST["max_ambig"],
@@ -80,7 +83,9 @@ def submit(request,
                                              precluster_diffs=request.POST["precluster_diffs"],
                                              classify_seqs_cutoff=request.POST["classify_seqs_cutoff"],
                                              amplicon_type=request.POST["amplicon_type"])
-    moth_cmd_dict = {"job-name": sub_data.job_name,
+    moth_cmd_dict = {"run": "sbatch",
+                     "output-dir": headnode_dir,
+                     "job-name": sub_data.job_name,
                      "notify-email": sub_data.notify_email,
                      "max-ambig": sub_data.max_ambig,
                      "max-homop": sub_data.max_homop,
@@ -90,16 +95,15 @@ def submit(request,
                      "screen-criteria": sub_data.screen_criteria,
                      "chop-length": sub_data.chop_length,
                      "precluster-diffs": sub_data.chop_length,
-                     "classify-seqs-cutoff": sub_data.classify_seqs_cutoff,
-                     "amplicon-type": sub_data.amplicon_type}
+                     "classify-seqs-cutoff": sub_data.classify_seqs_cutoff}
     if seqs_count > 500000:
         moth_cmd_dict["resources"] = "phi"
-    else:
-        moth_cmd_dict["resources"] = "s"
-    moth_cmd = utils.render_moth_cmd(moth_files="{}{}".format(settings.HEADNODE_PREFIX_URL,
-                                                              job.job_id),
+    moth_cmd = utils.render_moth_cmd(moth_files=headnode_dir,
                                      moth_options=moth_cmd_dict)
     job_id_link = "".format(job.job_id)
+    os.system("scp -r {} headnode:{}".format(upld_dir,
+                                             settings.HEADNODE_PREFIX_URL))
+    os.system("ssh headnode {}".format(moth_cmd))
     return render(request,
                   "mothulity/submit.html.jj2",
                   {"notify_email": request.POST["notify_email"],
