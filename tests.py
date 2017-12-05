@@ -6,7 +6,7 @@ from django.conf import settings
 from io import BytesIO
 import os
 import uuid
-from mothulity import views, models, utils
+from mothulity import views, models, utils, sched
 
 
 class UtilsTests(TestCase):
@@ -114,3 +114,43 @@ class ModelsTest(TestCase):
         j_id.save()
         stats = j_id.seqsstats_set.create(seqs_count=self.test_seqs_count)
         self.assertIs(stats.seqs_count, self.test_seqs_count)
+
+
+class SchedulerTests(TestCase):
+    """
+    Tests for the scheduler actions.
+    """
+    def setUp(self):
+        """
+        Sets up class level attributes for the tests.
+
+        Parameters
+        -------
+        sinfo_raw: str
+            Path to test sinfo log file.
+        long_idle_nodes: int, <61>
+            Number of nodes idle in queue long.
+        """
+        self.sinfo_file = "mothulity/tests/sinfo.log"
+        self.long_idle_nodes = 61
+        self.accel_idle_nodes = 12
+        self.accel_alloc_nodes = 3
+
+    def test_parse_sinfo(self):
+        """
+        Tests whether sinfo log file returns expected values.
+        """
+        with open(self.sinfo_file) as fin:
+            sinfo_str = fin.read()
+        self.assertEqual(sched.parse_sinfo(sinfo_str,
+                                           partition="long",
+                                           state="idle"),
+                         self.long_idle_nodes)
+        self.assertEqual(sched.parse_sinfo(sinfo_str,
+                                           partition="accel",
+                                           state="idle"),
+                         self.accel_idle_nodes)
+        self.assertEqual(sched.parse_sinfo(sinfo_str,
+                                           partition="accel",
+                                           state="alloc"),
+                         self.accel_alloc_nodes)
