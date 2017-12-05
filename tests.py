@@ -26,7 +26,7 @@ class UtilsTests(TestCase):
         """
         fastq_file = "mothulity/tests/Mock_S280_L001_R1_001.fastq"
         summ_file = "mothulity/tests/mothur.job.trim.contigs.summary"
-        self.remote_machine="headnode"
+        self.remote_machine = "headnode"
         self.fastq_file_remote = "/home/dizak/misc/mothulity_django_tests/Mock_S280_L001_R1_001.fastq"
         self.fastq_file = "{}/{}".format(settings.BASE_DIR,
                                          fastq_file)
