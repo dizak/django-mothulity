@@ -131,6 +131,9 @@ class SchedulerTests(TestCase):
         long_idle_nodes: int, <61>
             Number of nodes idle in queue long.
         """
+        self.machine = "headnode"
+        self.cmd = "uname"
+        self.cmd_out = "Linux"
         self.sinfo_file = "mothulity/tests/sinfo.log"
         self.long_idle_nodes = 61
         self.accel_idle_nodes = 12
@@ -154,3 +157,11 @@ class SchedulerTests(TestCase):
                                            partition="accel",
                                            state="alloc"),
                          self.accel_alloc_nodes)
+
+    def test_ssh_cmd(self):
+        """
+        Tests whether commands via ssh are successful.
+        """
+        self.assertEqual(sched.ssh_cmd(self.cmd,
+                                       self.machine),
+                         self.cmd_out)
