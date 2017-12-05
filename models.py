@@ -40,3 +40,12 @@ class SubmissionData(models.Model):
 
     def __str__(self):
         return self.job_name
+
+
+class JobStatus(models.Model):
+    job_id = models.ForeignKey(JobID,
+                               on_delete=models.CASCADE)
+    job_status = models.CharField(max_length=10)
+
+    def __str__(self):
+        return self.job_status
