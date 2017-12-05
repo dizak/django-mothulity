@@ -23,6 +23,10 @@ class UtilsTests(TestCase):
             Path to test fastq file.
         summ_file: str
             Path to test non-fastq file.
+        sinfo_raw: str
+            Path to test sinfo log file.
+        long_idle_nodes: int, <61>
+            Number of nodes idle in queue long.
         """
         fastq_file = "mothulity/tests/Mock_S280_L001_R1_001.fastq"
         summ_file = "mothulity/tests/mothur.job.trim.contigs.summary"
@@ -33,6 +37,13 @@ class UtilsTests(TestCase):
         self.summ_file = "{}/{}".format(settings.BASE_DIR,
                                         summ_file)
         self.mock_md5sum = "7e4f54362bd0f030a623a6aaba27ddba"
+        self.machine = "headnode"
+        self.cmd = "uname"
+        self.cmd_out = "Linux"
+        self.sinfo_file = "mothulity/tests/sinfo.log"
+        self.long_idle_nodes = 61
+        self.accel_idle_nodes = 12
+        self.accel_alloc_nodes = 3
 
     def test_sniff_true(self):
         """
@@ -58,6 +69,33 @@ class UtilsTests(TestCase):
                                       remote=True,
                                       machine=self.remote_machine),
                          self.mock_md5sum)
+
+    def test_parse_sinfo(self):
+        """
+        Tests whether sinfo log file returns expected values.
+        """
+        with open(self.sinfo_file) as fin:
+            sinfo_str = fin.read()
+        self.assertEqual(sched.parse_sinfo(sinfo_str,
+                                           partition="long",
+                                           state="idle"),
+                         self.long_idle_nodes)
+        self.assertEqual(sched.parse_sinfo(sinfo_str,
+                                           partition="accel",
+                                           state="idle"),
+                         self.accel_idle_nodes)
+        self.assertEqual(sched.parse_sinfo(sinfo_str,
+                                           partition="accel",
+                                           state="alloc"),
+                         self.accel_alloc_nodes)
+
+    def test_ssh_cmd(self):
+        """
+        Tests whether commands via ssh are successful.
+        """
+        self.assertEqual(sched.ssh_cmd(self.cmd,
+                                       self.machine),
+                         self.cmd_out)
 
 
 class ViewsResponseTests(TestCase):
@@ -114,54 +152,3 @@ class ModelsTest(TestCase):
         j_id.save()
         stats = j_id.seqsstats_set.create(seqs_count=self.test_seqs_count)
         self.assertIs(stats.seqs_count, self.test_seqs_count)
-
-
-class SchedulerTests(TestCase):
-    """
-    Tests for the scheduler actions.
-    """
-    def setUp(self):
-        """
-        Sets up class level attributes for the tests.
-
-        Parameters
-        -------
-        sinfo_raw: str
-            Path to test sinfo log file.
-        long_idle_nodes: int, <61>
-            Number of nodes idle in queue long.
-        """
-        self.machine = "headnode"
-        self.cmd = "uname"
-        self.cmd_out = "Linux"
-        self.sinfo_file = "mothulity/tests/sinfo.log"
-        self.long_idle_nodes = 61
-        self.accel_idle_nodes = 12
-        self.accel_alloc_nodes = 3
-
-    def test_parse_sinfo(self):
-        """
-        Tests whether sinfo log file returns expected values.
-        """
-        with open(self.sinfo_file) as fin:
-            sinfo_str = fin.read()
-        self.assertEqual(sched.parse_sinfo(sinfo_str,
-                                           partition="long",
-                                           state="idle"),
-                         self.long_idle_nodes)
-        self.assertEqual(sched.parse_sinfo(sinfo_str,
-                                           partition="accel",
-                                           state="idle"),
-                         self.accel_idle_nodes)
-        self.assertEqual(sched.parse_sinfo(sinfo_str,
-                                           partition="accel",
-                                           state="alloc"),
-                         self.accel_alloc_nodes)
-
-    def test_ssh_cmd(self):
-        """
-        Tests whether commands via ssh are successful.
-        """
-        self.assertEqual(sched.ssh_cmd(self.cmd,
-                                       self.machine),
-                         self.cmd_out)
