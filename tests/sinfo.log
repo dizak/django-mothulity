@@ -1,0 +1,16 @@
+PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
+debug        up   infinite      4  down* n[6,21-22],phi2
+debug        up   infinite      3  alloc phi[1,3-4]
+debug        up   infinite     73   idle gpu[1-8],n[1-5,7-20,23-64],phi[5-8]
+test         up      15:00      3  down* n[6,21-22]
+test         up      15:00     61   idle n[1-5,7-20,23-64]
+short*       up 2-00:00:00      3  down* n[6,21-22]
+short*       up 2-00:00:00     61   idle n[1-5,7-20,23-64]
+big          up 7-00:00:00      3  down* n[6,21-22]
+big          up 7-00:00:00     61   idle n[1-5,7-20,23-64]
+long         up 14-00:00:0      3  down* n[6,21-22]
+long         up 14-00:00:0     61   idle n[1-5,7-20,23-64]
+accel        up 14-00:00:0      1  down* phi2
+accel        up 14-00:00:0      3  alloc phi[1,3-4]
+accel        up 14-00:00:0     12   idle gpu[1-8],phi[5-8]
+infinity     up   infinite      4   idle n[1-4]
