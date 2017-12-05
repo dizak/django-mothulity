@@ -58,13 +58,24 @@ class UtilsTests(TestCase):
         self.assertIs(utils.sniff_file(self.summ_file), False)
 
     def test_count_seqs(self):
+        """
+        Tests whether utils.count_seqs return expected reads number.
+        """
         self.assertEqual(utils.count_seqs(self.fastq_file), 4779)
 
     def test_md5sum(self):
+        """
+        Tests whether utils.md5sum returns correct hash when run on file\
+        locally.
+        """
         self.assertEqual(utils.md5sum(self.fastq_file),
                          self.mock_md5sum)
 
     def test_md5sum_remote(self):
+        """
+        Tests whether utils.md5sum returns correct hash when run on file\
+        rmeotely.
+        """
         self.assertEqual(utils.md5sum(self.fastq_file_remote,
                                       remote=True,
                                       machine=self.remote_machine),
@@ -148,6 +159,10 @@ class ModelsTest(TestCase):
         self.assertIs(j_id.job_id, self.test_job_id)
 
     def test_seqsstats(self):
+        """
+        Tests whether job_id is properly saved and retrieved into and from the\
+        model as well as creation of seqsstats_set connected with the job_id.
+        """
         j_id = models.JobID(job_id=self.test_job_id)
         j_id.save()
         stats = j_id.seqsstats_set.create(seqs_count=self.test_seqs_count)
