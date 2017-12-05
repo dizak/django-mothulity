@@ -76,15 +76,15 @@ class UtilsTests(TestCase):
         """
         with open(self.sinfo_file) as fin:
             sinfo_str = fin.read()
-        self.assertEqual(sched.parse_sinfo(sinfo_str,
+        self.assertEqual(utils.parse_sinfo(sinfo_str,
                                            partition="long",
                                            state="idle"),
                          self.long_idle_nodes)
-        self.assertEqual(sched.parse_sinfo(sinfo_str,
+        self.assertEqual(utils.parse_sinfo(sinfo_str,
                                            partition="accel",
                                            state="idle"),
                          self.accel_idle_nodes)
-        self.assertEqual(sched.parse_sinfo(sinfo_str,
+        self.assertEqual(utils.parse_sinfo(sinfo_str,
                                            partition="accel",
                                            state="alloc"),
                          self.accel_alloc_nodes)
@@ -93,7 +93,7 @@ class UtilsTests(TestCase):
         """
         Tests whether commands via ssh are successful.
         """
-        self.assertEqual(sched.ssh_cmd(self.cmd,
+        self.assertEqual(utils.ssh_cmd(self.cmd,
                                        self.machine),
                          self.cmd_out)
 
