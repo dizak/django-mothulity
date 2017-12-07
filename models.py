@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
 from django.db import models
 
 # Create your models here.
@@ -43,6 +42,14 @@ class SubmissionData(models.Model):
 
 
 class JobStatus(models.Model):
+    """
+    Model for job status description.
+
+    Parameters
+    -------
+    added_time: int
+        Number of times a job has been submitted.
+    """
     job_id = models.ForeignKey(JobID,
                                on_delete=models.CASCADE)
     job_status = models.CharField(max_length=10)
