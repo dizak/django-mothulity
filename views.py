@@ -2,8 +2,9 @@
 from __future__ import unicode_literals
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
+from django.utils import timezone
 from mothulity.forms import FileFieldForm, OptionsForm
-from mothulity.models import JobID, SubmissionData
+from mothulity.models import *
 import utils
 import uuid
 import os
@@ -67,48 +68,23 @@ def index(request,
 def submit(request,
            job):
     job = get_object_or_404(JobID, job_id=job)
-    seqs_count = job.seqsstats_set.values()[0]["seqs_count"]
-    upld_dir = "{}{}".format(settings.MEDIA_URL, job.job_id)
-    headnode_dir = "{}{}".format(settings.HEADNODE_PREFIX_URL,
-                                 job.job_id)
-    sub_data = job.submissiondata_set.create(job_name=request.POST["job_name"],
-                                             notify_email=request.POST["notify_email"],
-                                             max_ambig=request.POST["max_ambig"],
-                                             max_homop=request.POST["max_homop"],
-                                             min_length=request.POST["min_length"],
-                                             max_length=request.POST["max_length"],
-                                             min_overlap=request.POST["min_overlap"],
-                                             screen_criteria=request.POST["screen_criteria"],
-                                             chop_length=request.POST["chop_length"],
-                                             precluster_diffs=request.POST["precluster_diffs"],
-                                             classify_seqs_cutoff=request.POST["classify_seqs_cutoff"],
-                                             amplicon_type=request.POST["amplicon_type"])
-    moth_cmd_dict = {"run": "sbatch",
-                     "output-dir": headnode_dir,
-                     "job-name": sub_data.job_name,
-                     "notify-email": sub_data.notify_email,
-                     "max-ambig": sub_data.max_ambig,
-                     "max-homop": sub_data.max_homop,
-                     "min-length": sub_data.min_length,
-                     "max-length": sub_data.max_length,
-                     "min-overlap": sub_data.min_overlap,
-                     "screen-criteria": sub_data.screen_criteria,
-                     "chop-length": sub_data.chop_length,
-                     "precluster-diffs": sub_data.precluster_diffs,
-                     "classify-seqs-cutoff": sub_data.classify_seqs_cutoff}
-    if seqs_count > 500000:
-        moth_cmd_dict["resources"] = "phi"
-    moth_cmd = utils.render_moth_cmd(moth_files=headnode_dir,
-                                     moth_options=moth_cmd_dict)
-    job_id_link = "".format(job.job_id)
-    os.system("scp -r {} headnode:{}".format(upld_dir,
-                                             settings.HEADNODE_PREFIX_URL))
-    os.system("ssh headnode {}".format(moth_cmd))
+    job.submissiondata_set.create(job_name=request.POST["job_name"],
+                                  notify_email=request.POST["notify_email"],
+                                  max_ambig=request.POST["max_ambig"],
+                                  max_homop=request.POST["max_homop"],
+                                  min_length=request.POST["min_length"],
+                                  max_length=request.POST["max_length"],
+                                  min_overlap=request.POST["min_overlap"],
+                                  screen_criteria=request.POST["screen_criteria"],
+                                  chop_length=request.POST["chop_length"],
+                                  precluster_diffs=request.POST["precluster_diffs"],
+                                  classify_seqs_cutoff=request.POST["classify_seqs_cutoff"],
+                                  amplicon_type=request.POST["amplicon_type"])
+    job.jobstatus_set.create(job_status="pending")
     return render(request,
                   "mothulity/submit.html.jj2",
                   {"notify_email": request.POST["notify_email"],
-                   "job_id": job.job_id,
-                   "moth_cmd": moth_cmd})
+                   "job_id": job.job_id})
 
 
 def status(request,
