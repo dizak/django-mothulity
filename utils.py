@@ -148,7 +148,12 @@ def count_seqs(input_files,
 
 def render_moth_cmd(moth_exec="mothulity.py",
                     moth_files=None,
-                    moth_options=None):
+                    moth_opts=None,
+                    shell="sbatch",
+                    remove_spaces=True,
+                    pop_elems=["id",
+                               "job_id_id",
+                               "amplicon_type"]):
     """
     Returns ready-to-go CLI command for mothulity from dict
 
@@ -158,17 +163,23 @@ def render_moth_cmd(moth_exec="mothulity.py",
         Mothulity executable.
     moth_files: str, default <None>
         path/to/input/files.
-    moth_options: dict
+    moth_opts: dict
         Dict of kvals converted to POSIX CLI optional arguments.
+    remove_spaces: bool
+        Replace whitespaces with underscores in job_name. Default <True>.
 
     Returns
     -------
     str
         POSIX mothulity command.
     """
-    moth_opt_zip = zip(moth_options.keys(),
-                       moth_options.values())
-    moth_opt_str = " ".join(["--{} {}".format(k, v) for k, v in moth_opt_zip])
+    if remove_spaces is True:
+        moth_opts["job_name"] = moth_opts["job_name"].replace(" ", "_")
+    for i in pop_elems:
+        moth_opts.pop(i)
+    moth_opts["run"] = shell
+    moth_opt_str = " ".join(["--{} {}".format(k.replace("_", "-"), v)
+                             for k, v in moth_opts.items()])
     return "{} {} {}".format(moth_exec,
                              moth_files,
                              moth_opt_str)
