@@ -10,7 +10,7 @@ import django
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 
-sys.path.append("/home/dizak/Software/django_site/")
+sys.path.append("/home/darek/git_repos/django_site/")
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_site.settings")
 django.setup()
 
@@ -18,8 +18,14 @@ from mothulity.models import *
 from mothulity import utils
 
 
-def get_pending_ids():
-    return [i.job_id for i in JobStatus.objects.filter(job_status="pending")]
+def get_pending_ids(ids_quantity=10,
+                    status="pending",
+                    status_model=JobStatus):
+        ids = [i.job_id for i in status_model.objects.filter(job_status=status).order_by("-submission_time")]
+        if len(ids) < ids_quantity:
+            return ids
+        else:
+            return ids[ids_quantity]
 
 
 def queue_submit(job_id,
@@ -38,8 +44,9 @@ def queue_submit(job_id,
 
 
 def change_status(job_id,
-                  new_status="submitted"):
-    job = JobStatus.objects.filter(job_id=job_id)[0]
+                  new_status="submitted",
+                  status_model=JobStatus):
+    job = status_model.objects.filter(job_id=job_id)[0]
     job.job_status = new_status
     job.save()
 
