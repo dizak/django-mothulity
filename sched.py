@@ -50,6 +50,9 @@ def queue_submit(job_id,
     headnode_md5 = utils.md5sum("{}*".format(headnode_dir), remote=True)
     if sorted(upld_md5) == sorted(headnode_md5):
         os.system("ssh headnode {}".format(moth_cmd))
+        return True
+    else:
+        return False
 
 
 def change_status(job_id,
@@ -68,11 +71,11 @@ def job():
         upld_dir = "{}{}/".format(settings.MEDIA_URL, i)
         headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, i)
         if get_seqs_count(i) > 500000 and idle_phis > 5:
-            queue_submit(i, upld_dir, headnode_dir)
-            change_status(i)
+            if queue_submit(i, upld_dir, headnode_dir) is True:
+                change_status(i)
         if get_seqs_count(i) < 500000 and idle_ns > 30:
-            queue_submit(i, upld_dir, headnode_dir)
-            change_status(i)
+            if queue_submit(i, upld_dir, headnode_dir) is True:
+                change_status(i)
 
 schedule.every(1).seconds.do(job)
 
