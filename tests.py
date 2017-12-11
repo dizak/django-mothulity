@@ -157,14 +157,14 @@ class ModelsTest(TestCase):
 
     def test_job_id(self):
         """
-        Tests whether job_id is properly saved and retrieved into and from the\
+        Tests whether job_id is properly saved and retrieved into and from the
         model.
         """
         self.assertIs(self.j_id.job_id, self.test_job_id)
 
     def test_seqsstats(self):
         """
-        Tests whether job_id is properly saved and retrieved into and from the\
+        Tests whether job_id is properly saved and retrieved into and from the
         model as well as creation of seqsstats_set connected with the job_id.
         """
         stats = self.j_id.seqsstats_set.create(seqs_count=self.test_seqs_count)
