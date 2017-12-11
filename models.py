@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from django.db import models
+from django.utils import timezone
+import pytz
 
 # Create your models here.
 
@@ -53,6 +55,8 @@ class JobStatus(models.Model):
     job_id = models.ForeignKey(JobID,
                                on_delete=models.CASCADE)
     job_status = models.CharField(max_length=10)
+    submission_time = models.DateTimeField("submission time",
+                                           default=timezone.now)
 
     def __str__(self):
         return self.job_status

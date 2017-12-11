@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 from django.test import TestCase
 from django.urls import reverse
 from django.conf import settings
+from django.utils import timezone
+import pytz
 from io import BytesIO
 import os
 import uuid
@@ -148,20 +150,32 @@ class ModelsTest(TestCase):
         """
         self.test_job_id = str(uuid.uuid4())
         self.test_seqs_count = 17
-        j_id = models.JobID(job_id=self.test_job_id)
-        j_id.save()
+        self.test_job_status = "pending"
+        self.test_submission_time = timezone.now()
+        self.j_id = models.JobID(job_id=self.test_job_id)
+        self.j_id.save()
 
     def test_job_id(self):
         """
         Tests whether job_id is properly saved and retrieved into and from the\
         model.
         """
-        self.assertIs(j_id.job_id, self.test_job_id)
+        self.assertIs(self.j_id.job_id, self.test_job_id)
 
     def test_seqsstats(self):
         """
         Tests whether job_id is properly saved and retrieved into and from the\
         model as well as creation of seqsstats_set connected with the job_id.
         """
-        stats = j_id.seqsstats_set.create(seqs_count=self.test_seqs_count)
+        stats = self.j_id.seqsstats_set.create(seqs_count=self.test_seqs_count)
         self.assertIs(stats.seqs_count, self.test_seqs_count)
+
+    def test_jobstatus(self):
+        """
+        Tests whether job_status and submission_time are properly saved and
+        retrieved.
+        """
+        status = self.j_id.jobstatus_set.create(job_status=self.test_job_status,
+                                                submission_time=self.test_submission_time)
+        self.assertIs(status.job_status, self.test_job_status)
+        self.assertIs(status.submission_time, self.test_submission_time)
