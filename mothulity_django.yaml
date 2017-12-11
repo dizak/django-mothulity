@@ -2,9 +2,6 @@ name: mothulity_django
 channels:
 - conda-forge
 - defaults
-- mpi4py
-- bioconda
-- biocore
 dependencies:
 - asn1crypto=0.22.0=py27_0
 - backports=1.0=py27_1
@@ -66,7 +63,6 @@ dependencies:
 - pysocks=1.6.7=py27_0
 - python=2.7.14=1
 - python-dateutil=2.6.1=py27_0
-- pytz=2017.3=py_2
 - qt=5.6.2=3
 - readline=6.2=0
 - requests=2.18.4=py27_1
@@ -100,6 +96,7 @@ dependencies:
 - mkl=2018.0.1=h19d6760_4
 - numpy=1.10.2=py27_0
 - openblas=0.2.14=4
+- pytz=2017.3=py27h001bace_0
 - scipy=1.0.0=py27hf5f0f52_0
 - pip:
   - backports-abc==0.5
@@ -109,5 +106,7 @@ dependencies:
   - ipython-genutils==0.2.0
   - prompt-toolkit==1.0.15
   - schedule==0.5.0
-prefix: /home/dizak/anaconda2/envs/mothulity_django
+  - speedtest-cli==0.3.4
+  - youtube-dl==2016.9.19
+prefix: /home/darek/anaconda2/envs/mothulity_django
 
