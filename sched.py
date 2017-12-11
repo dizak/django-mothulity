@@ -19,7 +19,7 @@ from mothulity.models import *
 from mothulity import utils
 
 
-def get_pending_ids(ids_quantity=5,
+def get_pending_ids(ids_quantity=20,
                     status="pending",
                     status_model=JobStatus):
         ids = [i.job_id for i in status_model.objects.filter(job_status=status).order_by("-submission_time")]
