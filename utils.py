@@ -61,11 +61,14 @@ def md5sum(input_file,
     if remote is True:
         md5_output = sp.check_output("ssh {} md5sum {}".format(machine,
                                                                input_file),
-                                     shell=True)
+                                     shell=True).split()[::2]
     else:
         md5_output = sp.check_output("md5sum {}".format(input_file),
-                                     shell=True)
-    return str(md5_output.split(" ")[0])
+                                     shell=True).split()[::2]
+    if len(md5_output) > 1:
+        return md5_output
+    else:
+        return md5_output[0]
 
 
 def parse_sinfo(input_str,
