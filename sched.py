@@ -5,6 +5,7 @@ import os
 import sys
 import schedule
 import subprocess as sp
+from glob import glob
 
 import django
 from django.conf import settings
@@ -45,7 +46,10 @@ def queue_submit(job_id,
                                      moth_opts=sub_data)
     os.system("scp -r {} headnode:{}".format(upld_dir,
                                              settings.HEADNODE_PREFIX_URL))
-    os.system("ssh headnode {}".format(moth_cmd))
+    upld_md5 = utils.md5sum("{}*".format(upld_dir))
+    headnode_md5 = utils.md5sum("{}*".format(headnode_dir), remote=True)
+    if sorted(upld_md5) == sorted(headnode_md5):
+        os.system("ssh headnode {}".format(moth_cmd))
 
 
 def change_status(job_id,
@@ -61,8 +65,8 @@ def job():
     for i in pending_ids:
         idle_ns = utils.parse_sinfo(utils.ssh_cmd("sinfo"), "long", "idle")
         idle_phis = utils.parse_sinfo(utils.ssh_cmd("sinfo"), "accel", "idle")
-        upld_dir = "{}{}".format(settings.MEDIA_URL, i)
-        headnode_dir = "{}{}".format(settings.HEADNODE_PREFIX_URL, i)
+        upld_dir = "{}{}/".format(settings.MEDIA_URL, i)
+        headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, i)
         if get_seqs_count(i) > 500000 and idle_phis > 5:
             queue_submit(i, upld_dir, headnode_dir)
             change_status(i)
@@ -70,8 +74,7 @@ def job():
             queue_submit(i, upld_dir, headnode_dir)
             change_status(i)
 
-
-schedule.every(5).minutes.do(job)
+schedule.every(1).seconds.do(job)
 
 
 def main():
