@@ -18,7 +18,7 @@ from mothulity.models import *
 from mothulity import utils
 
 
-def get_pending_ids(ids_quantity=10,
+def get_pending_ids(ids_quantity=5,
                     status="pending",
                     status_model=JobStatus):
         ids = [i.job_id for i in status_model.objects.filter(job_status=status).order_by("-submission_time")]
@@ -26,6 +26,11 @@ def get_pending_ids(ids_quantity=10,
             return ids
         else:
             return ids[:ids_quantity]
+
+
+def get_seqs_count(job_id):
+    job = get_object_or_404(JobID, job_id=job_id)
+    return job.seqsstats_set.values()[0]["seqs_count"]
 
 
 def queue_submit(job_id,
@@ -52,20 +57,21 @@ def change_status(job_id,
 
 
 def job():
-    idle_ns = utils.parse_sinfo(utils.ssh_cmd("sinfo"),
-                                "long",
-                                "idle")
-    if idle_ns > 30:
-        pending_ids = get_pending_ids()
-        for i in pending_ids:
-            upld_dir = "{}{}".format(settings.MEDIA_URL, i)
-            headnode_dir = "{}{}".format(settings.HEADNODE_PREFIX_URL,
-                                         i)
+    pending_ids = get_pending_ids()
+    for i in pending_ids:
+        idle_ns = utils.parse_sinfo(utils.ssh_cmd("sinfo"), "long", "idle")
+        idle_phis = utils.parse_sinfo(utils.ssh_cmd("sinfo"), "accel", "idle")
+        upld_dir = "{}{}".format(settings.MEDIA_URL, i)
+        headnode_dir = "{}{}".format(settings.HEADNODE_PREFIX_URL, i)
+        if get_seqs_count(i) > 500000 and idle_phis > 5:
+            queue_submit(i, upld_dir, headnode_dir)
+            change_status(i)
+        if get_seqs_count(i) < 500000 and idle_ns > 30:
             queue_submit(i, upld_dir, headnode_dir)
             change_status(i)
 
 
-schedule.every(1).seconds.do(job)
+schedule.every(5).minutes.do(job)
 
 
 def main():
