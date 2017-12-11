@@ -25,7 +25,7 @@ def get_pending_ids(ids_quantity=10,
         if len(ids) < ids_quantity:
             return ids
         else:
-            return ids[ids_quantity]
+            return ids[:ids_quantity]
 
 
 def queue_submit(job_id,
