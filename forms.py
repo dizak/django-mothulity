@@ -83,7 +83,7 @@ class OptionsForm(forms.Form):
         information to OptionsForm._errors and deletes value from
         OptionsForm.cleaned_data.
         """
-        if self.cleaned_data["min_length"] > self.cleaned_data["max_length"]:
+        if self.cleaned_data["min_length"] >= self.cleaned_data["max_length"]:
             self._errors["min_length"] = ["min_length > max_length"]
             self._errors["max_length"] = ["max_length < min_length"]
             del self.cleaned_data["min_length"]
