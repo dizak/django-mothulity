@@ -24,8 +24,7 @@ def get_pending_ids(ids_quantity=20,
                     status_model=JobStatus):
     """
     Returns Job IDs of oldest pending jobs within given limit retrieved from
-    JobStatus
-    model.
+    JobStatus model.
 
     Parameters
     -------
@@ -39,7 +38,7 @@ def get_pending_ids(ids_quantity=20,
     Returns
     -------
     list of str
-        job_id with pending status.
+        job_id with <pending> status.
     """
     ids = [i.job_id for i in status_model.objects.filter(job_status=status).
            order_by("-submission_time")]
@@ -47,6 +46,26 @@ def get_pending_ids(ids_quantity=20,
         return ids
     else:
         return ids[:ids_quantity]
+
+
+def get_submitted_ids(status="submitted",
+                      status_model=JobStatus):
+    """
+    Returns Job IDs of submitted jobs
+
+    Parameters
+    -------
+    status: str, default <submitted>
+        Status of job in JobStatus model.
+    status_model: django.models.Model, default JobStatus
+        Django model to use.
+
+    Returns
+    -------
+    list of str
+        job_id with <submitted> status.
+    """
+    return [i.job_id for i in status_model.objects.filter(job_status=status)]
 
 
 def get_seqs_count(job_id):
@@ -160,6 +179,7 @@ def job():
     Retrieve pending jobs and submit them properly to the computing cluster.
     """
     pending_ids = get_pending_ids()
+    submitted_ids = get_submitted_ids()
     for i in pending_ids:
         idle_ns = utils.parse_sinfo(utils.ssh_cmd("sinfo"), "long", "idle")
         idle_phis = utils.parse_sinfo(utils.ssh_cmd("sinfo"), "accel", "idle")
@@ -171,6 +191,9 @@ def job():
         if get_seqs_count(i) < 500000 and idle_ns > 30:
             if queue_submit(i, upld_dir, headnode_dir) is True:
                 change_status(i)
+    for i in submitted_ids:
+        if isdone(i) is True:
+            print "It is done!"
 
 schedule.every(1).seconds.do(job)
 
