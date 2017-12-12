@@ -4,12 +4,18 @@ input_class = "w3-input"
 
 
 class FileFieldForm(forms.Form):
+    """
+    Form for multiple files upload.
+    """
     file_field = forms.FileField(widget=forms.ClearableFileInput(attrs={"multiple": True,
                                                                         "class": input_class,
                                                                         "autocomplete": "off"}))
 
 
 class OptionsForm(forms.Form):
+    """
+    Form for specifying analysis options and parameters.
+    """
     job_name = forms.CharField(label="Name of your job. It will be displayed\
                                in the results.",
                                max_length=20,
