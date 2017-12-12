@@ -86,13 +86,19 @@ def get_seqs_count(job_id):
     return job.seqsstats_set.values()[0]["seqs_count"]
 
 
+def get_submission_id(job_id):
+    job = get_object_or_404(JobID, job_id=job_id)
+    return job.jobstatus_set.values()[0]["submission_id"]
+
+
 def queue_submit(job_id,
                  upld_dir,
                  headnode_dir,
                  sbatch_success="Submitted batch job"):
     """
     Retrieves required data from models by Job ID, renders mothulity command,
-    copies files to computing cluster and send the command.
+    copies files to computing cluster and sends the mothulity command. Adds
+    JobStatus.submission_id after slurm.
 
     Parameters
     -------
@@ -127,6 +133,8 @@ def queue_submit(job_id,
     if sorted(upld_md5) == sorted(headnode_md5):
         sbatch_out = utils.ssh_cmd(moth_cmd)
         if sbatch_success in sbatch_out:
+            add_submission_id(job_id=job_id,
+                              submission_id=int(sbatch_out.split(" ")[-1]))
             return True
     else:
         return False
@@ -149,6 +157,26 @@ def change_status(job_id,
     """
     job = status_model.objects.filter(job_id=job_id)[0]
     job.job_status = new_status
+    job.save()
+
+
+def add_submission_id(job_id,
+                      submission_id,
+                      status_model=JobStatus):
+    """
+    Adds submission ID to the existing set in the JobStatus model.
+
+    Parameters
+    -------
+    job_id: str
+        Job ID of job which status should be changed.
+    submission_id: int
+        Submission ID.
+    status_model: django.models.Model, default JobStatus
+        Django model to use.
+    """
+    job = status_model.objects.filter(job_id=job_id)[0]
+    job.submission_id = submission_id
     job.save()
 
 
@@ -210,13 +238,14 @@ def job():
             if queue_submit(i, upld_dir, headnode_dir) is True:
                 change_status(i)
     for i in submitted_ids:
+        print get_submission_id(i)
         upld_dir = "{}{}/".format(settings.MEDIA_URL, str(i).replace("-", "_"))
         headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(i).replace("-", "_"))
         if isdone(headnode_dir) is True:
             get_from_cluster(upld_dir, headnode_dir)
 
 
-schedule.every(1).seconds.do(job)
+schedule.every(10).seconds.do(job)
 
 
 def main():
