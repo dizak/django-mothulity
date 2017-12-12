@@ -1,4 +1,4 @@
-import os
+import subprocess as sp
 from glob import glob
 import subprocess as sp
 from skbio.io import sniff
@@ -35,8 +35,9 @@ def chmod_file(input_file,
     mod: int or str, default <400>
         Desired permissions of the input_file
     """
-    os.system("chmod {} {}".format(mod,
-                                   input_file))
+    sp.check_output("chmod {} {}".format(mod,
+                                         input_file),
+                    shell=True)
 
 
 def md5sum(input_file,

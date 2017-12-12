@@ -97,8 +97,9 @@ def queue_submit(job_id,
         sub_data["resources"] = "phi"
     moth_cmd = utils.render_moth_cmd(moth_files=headnode_dir,
                                      moth_opts=sub_data)
-    os.system("scp -r {} headnode:{}".format(upld_dir,
-                                             settings.HEADNODE_PREFIX_URL))
+    sp.check_output("scp -r {} headnode:{}".format(upld_dir,
+                                                   settings.HEADNODE_PREFIX_URL),
+                    shell=True)
     upld_md5 = utils.md5sum("{}*".format(upld_dir))
     headnode_md5 = utils.md5sum("{}*".format(headnode_dir), remote=True)
     if sorted(upld_md5) == sorted(headnode_md5):

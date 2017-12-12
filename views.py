@@ -7,7 +7,7 @@ from mothulity.forms import FileFieldForm, OptionsForm
 from mothulity.models import *
 import utils
 import uuid
-import os
+import subprocess as sp
 
 # Create your views here.
 
@@ -21,7 +21,7 @@ def index(request,
             job_id = uuid.uuid4()
             upld_dir = "{}{}/".format(settings.MEDIA_URL,
                                       job_id)
-            os.system("mkdir {}".format(upld_dir))
+            sp.check_output("mkdir {}".format(upld_dir), shell=True)
             upld_files = request.FILES.getlist("file_field")
             for upfile in upld_files:
                 utils.write_file(upfile,
@@ -34,7 +34,7 @@ def index(request,
                                     "fastq") is True:
                     pass
                 else:
-                    os.system("rm -r {}".format(upld_dir))
+                    sp.check_output("rm -r {}".format(upld_dir), shell=True)
                     form = FileFieldForm()
                     return render(request,
                                   "mothulity/index.html.jj2",
@@ -42,7 +42,7 @@ def index(request,
                                    "upload_error": True})
             seqs_count = utils.count_seqs("{}*fastq".format(upld_dir))
             if seqs_count > seqs_limit:
-                os.system("rm -r {}".format(upld_dir))
+                sp.check_output("rm -r {}".format(upld_dir), shell=True)
                 form = FileFieldForm()
                 return render(request,
                               "mothulity/index.html.jj2",
