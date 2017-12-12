@@ -34,7 +34,8 @@ class OptionsForm(forms.Form):
                                    widget=forms.
                                    TextInput(attrs={"value": 0,
                                                     "class": input_class}))
-    max_homop = forms.IntegerField(label="Maximum number of homopolymers allowed.",
+    max_homop = forms.IntegerField(label="Maximum number of homopolymers\
+                                   allowed.",
                                    widget=forms.
                                    TextInput(attrs={"value": 8,
                                                     "class": input_class}))
@@ -51,8 +52,9 @@ class OptionsForm(forms.Form):
                                      widget=forms.
                                      TextInput(attrs={"value": 25,
                                                       "class": input_class}))
-    screen_criteria = forms.IntegerField(label="Trim start and end of read to fit\
-                                         this percentage of all reads",
+    screen_criteria = forms.IntegerField(label="Trim start and end of the read\
+                                         will be selected to fit these values\
+                                         of that percentage of all reads",
                                          widget=forms.
                                          TextInput(attrs={"value": 95,
                                                           "class": input_class}))
@@ -67,7 +69,9 @@ class OptionsForm(forms.Form):
                                           TextInput(attrs={"value": 2,
                                                            "class": input_class}))
     classify_seqs_cutoff = forms.IntegerField(label="Bootstrap value for taxonomic\
-                                              assignment.",
+                                              assignment. Minimum value of\
+                                              read similarity to database when\
+                                              performing taxonomic assignment.",
                                               widget=forms.
                                               TextInput(attrs={"value": 80,
                                                                "class": input_class}))
