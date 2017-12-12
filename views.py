@@ -31,9 +31,7 @@ def index(request,
                                  mod=666)
                 if utils.sniff_file("{}{}".format(upld_dir,
                                                   upfile),
-                                    "fastq") is True:
-                    pass
-                else:
+                                    "fastq") is not True:
                     sp.check_output("rm -r {}".format(upld_dir), shell=True)
                     form = FileFieldForm()
                     return render(request,
