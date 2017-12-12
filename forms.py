@@ -76,3 +76,14 @@ class OptionsForm(forms.Form):
                                                ("ITS", "ITS")],
                                       widget=forms.
                                       RadioSelect())
+
+    def clean(self):
+        """
+        Validates if min_length is not greater than max_length. Passes proper
+        information to OptionsForm._errors and deletes value from
+        OptionsForm.cleaned_data.
+        """
+        if self.cleaned_data["min_length"] > self.cleaned_data["max_length"]:
+            self._errors["min_length"] = ["min_length > max_length"]
+            self._errors["max_length"] = ["max_length < min_length"]
+            del self.cleaned_data["min_length"]
