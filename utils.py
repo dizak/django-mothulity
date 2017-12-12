@@ -6,19 +6,22 @@ import Bio.SeqIO as sio
 
 
 def write_file(input_file,
-               path):
+               path,
+               chunk_size=8192):
     """
     Saves file from the forms.FileFieldForm to desired path in chunks.
 
     Parameters
     -------
-    input_file: str
+    input_file: django.core.files.uploadedfile.UploadedFile
         Name of the input file.
     path: str
         Path to file save.
+    chunk: int, default <8192>
+        Size of chunk the stream is divided to.
     """
     with open("/{}/{}".format(path, input_file), "wb+") as fout:
-        for chunk in input_file.chunks():
+        for chunk in input_file.chunks(chunk_size=chunk_size):
             fout.write(chunk)
 
 
