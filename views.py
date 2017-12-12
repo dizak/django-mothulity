@@ -67,24 +67,33 @@ def index(request,
 
 def submit(request,
            job):
-    job = get_object_or_404(JobID, job_id=job)
-    job.submissiondata_set.create(job_name=request.POST["job_name"],
-                                  notify_email=request.POST["notify_email"],
-                                  max_ambig=request.POST["max_ambig"],
-                                  max_homop=request.POST["max_homop"],
-                                  min_length=request.POST["min_length"],
-                                  max_length=request.POST["max_length"],
-                                  min_overlap=request.POST["min_overlap"],
-                                  screen_criteria=request.POST["screen_criteria"],
-                                  chop_length=request.POST["chop_length"],
-                                  precluster_diffs=request.POST["precluster_diffs"],
-                                  classify_seqs_cutoff=request.POST["classify_seqs_cutoff"],
-                                  amplicon_type=request.POST["amplicon_type"])
-    job.jobstatus_set.create(job_status="pending")
-    return render(request,
-                  "mothulity/submit.html.jj2",
-                  {"notify_email": request.POST["notify_email"],
-                   "job_id": job.job_id})
+    if request.method == "POST":
+        form = OptionsForm(request.POST)
+        if form.is_valid():
+            job = get_object_or_404(JobID, job_id=job)
+            job.submissiondata_set.create(job_name=request.POST["job_name"],
+                                          notify_email=request.POST["notify_email"],
+                                          max_ambig=request.POST["max_ambig"],
+                                          max_homop=request.POST["max_homop"],
+                                          min_length=request.POST["min_length"],
+                                          max_length=request.POST["max_length"],
+                                          min_overlap=request.POST["min_overlap"],
+                                          screen_criteria=request.POST["screen_criteria"],
+                                          chop_length=request.POST["chop_length"],
+                                          precluster_diffs=request.POST["precluster_diffs"],
+                                          classify_seqs_cutoff=request.POST["classify_seqs_cutoff"],
+                                          amplicon_type=request.POST["amplicon_type"])
+            job.jobstatus_set.create(job_status="pending")
+            return render(request,
+                          "mothulity/submit.html.jj2",
+                          {"notify_email": request.POST["notify_email"],
+                           "job_id": job.job_id})
+        else:
+            return render(request,
+                          "mothulity/options.html.jj2",
+                          {"form": form,
+                           "job": job,
+                           "error": form.errors})
 
 
 def status(request,
