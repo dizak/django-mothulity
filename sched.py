@@ -69,7 +69,8 @@ def get_seqs_count(job_id):
 
 def queue_submit(job_id,
                  upld_dir,
-                 headnode_dir):
+                 headnode_dir,
+                 sbatch_success="Submitted batch job"):
     """
     Retrieves required data from models by Job ID, renders mothulity command,
     copies files to computing cluster and send the command.
@@ -101,8 +102,9 @@ def queue_submit(job_id,
     upld_md5 = utils.md5sum("{}*".format(upld_dir))
     headnode_md5 = utils.md5sum("{}*".format(headnode_dir), remote=True)
     if sorted(upld_md5) == sorted(headnode_md5):
-        os.system("ssh headnode {}".format(moth_cmd))
-        return True
+        sbatch_out = utils.ssh_cmd(moth_cmd)
+        if sbatch_success in sbatch_out:
+            return True
     else:
         return False
 
