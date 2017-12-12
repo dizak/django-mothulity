@@ -14,6 +14,21 @@ import subprocess as sp
 
 def index(request,
           seqs_limit=900000):
+    """
+    Evaluates file upload form, uploaded files, total number of reads, creates
+    Job ID and renders appropriate template.
+
+    Parameters
+    -------
+    request: HTTP.request
+    seqs_limit: int, default <900000>
+        Number of maximum reads per job allowed.
+
+    Return
+    ------
+    django.template
+        Template rendered to HTML.
+    """
     if request.method == "POST":
         form = FileFieldForm(request.POST,
                              request.FILES)
@@ -65,6 +80,21 @@ def index(request,
 
 def submit(request,
            job):
+    """
+    Evaluates options form retrieves Job ID and its properties, renders
+    appropriate template.
+
+    Parameters
+    -------
+    request: HTTP.request
+    job: str
+        Job ID
+
+    Return
+    ------
+    django.template
+        Template rendered to HTML.
+    """
     if request.method == "POST":
         form = OptionsForm(request.POST)
         if form.is_valid():
