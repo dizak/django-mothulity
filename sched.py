@@ -174,6 +174,28 @@ def isdone(job_id,
         return False
 
 
+def get_from_cluster(job_id,
+                     upld_dir,
+                     headnode_dir):
+    """
+    Copy zipped analysis file from the computing cluster back to the
+    web-server and check md5sum afterwards.
+
+    Parameters
+    -------
+    job_id: str
+        Job ID of which check is made.
+    upld_dir: str
+        Path to files on the web-service server.
+    headnode_dir: str
+        Path to files on the computing cluster.
+    """
+    sp.check_output("scp headnode:{}{}/analysis*zip {}/job_id".format(headnode_dir,
+                                                                      job_id,
+                                                                      upld_dir),
+                    shell=True)
+
+
 def job():
     """
     Retrieve pending jobs and submit them properly to the computing cluster.
@@ -192,8 +214,10 @@ def job():
             if queue_submit(i, upld_dir, headnode_dir) is True:
                 change_status(i)
     for i in submitted_ids:
+        upld_dir = "{}{}/".format(settings.MEDIA_URL, i)
+        headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, i)
         if isdone(i) is True:
-            print "It is done!"
+            get_from_cluster(i, upld_dir, headnode_dir)
 
 
 schedule.every(1).seconds.do(job)
