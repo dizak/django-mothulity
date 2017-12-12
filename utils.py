@@ -5,6 +5,13 @@ from skbio.io import sniff
 import Bio.SeqIO as sio
 
 
+class ParserError(Exception):
+    """
+    Inappropriate structure passed to parser.
+    """
+    pass
+
+
 def write_file(input_file,
                path,
                chunk_size=8192):
@@ -96,6 +103,9 @@ def parse_sinfo(input_str,
         Number of nodes in desired state and partition.
     """
     s_line = [i for i in input_str.split("\n") if partition in i and state in i]
+    if len(s_line) != 1:
+        raise ParserError("""Found more or less than one line matching. Check if
+              sinfo command output has not been changed.""")
     try:
         return int(s_line[0].split()[3])
     except IndexError:
@@ -150,6 +160,21 @@ def sniff_file(input_file,
 
 def count_seqs(input_files,
                file_format="fastq"):
+    """
+    Return number of all reads in the files.
+
+    Parameters
+    -------
+    input_file: str
+        Path to input files.
+    file_format: str
+        Format of input files.
+
+    Returns
+    -------
+    int
+        Sum of reads in input files.
+    """
     input_glob = glob(input_files)
     seqs = [sio.parse(i,
                       file_format) for i in input_glob]
