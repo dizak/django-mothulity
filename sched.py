@@ -130,6 +130,31 @@ def change_status(job_id,
     job.save()
 
 
+def isdone(job_id,
+           headnode_dir):
+    """
+    Check for the zipped analysis on the computing cluster and copy it back if
+    it exists or return False otherwise.
+
+    Parameters
+    -------
+    job_id: str
+        Job ID of which check is made.
+    headnode_dir: str
+        Path to files on the computing cluster.
+
+    Returns
+    -------
+    bool
+        True if file exists or False if it does not.
+    """
+    try:
+        utils.ssh_cmd("ls {}/{}/analysis*zip".format(headnode_dir, job_id))
+        return True
+    except Exception as e:
+        return False
+
+
 def job():
     """
     Retrieve pending jobs and submit them properly to the computing cluster.
