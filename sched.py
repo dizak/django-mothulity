@@ -114,6 +114,9 @@ def queue_submit(job_id,
     sub_data = job.submissiondata_set.values()[0]
     if seqs_count > 500000:
         sub_data["resources"] = "phi"
+        sub_data["processors"] = 32
+    else:
+        sub_data["processors"] = 12
     moth_cmd = utils.render_moth_cmd(moth_files=headnode_dir,
                                      moth_opts=sub_data)
     sp.check_output("scp -r {} headnode:{}".format(upld_dir,
@@ -149,16 +152,13 @@ def change_status(job_id,
     job.save()
 
 
-def isdone(job_id,
-           headnode_dir):
+def isdone(headnode_dir):
     """
     Check for the zipped analysis on the computing cluster and copy it back if
     it exists or return False otherwise.
 
     Parameters
     -------
-    job_id: str
-        Job ID of which check is made.
     headnode_dir: str
         Path to files on the computing cluster.
 
@@ -168,14 +168,13 @@ def isdone(job_id,
         True if file exists or False if it does not.
     """
     try:
-        utils.ssh_cmd("ls {}/{}/analysis*zip".format(headnode_dir, job_id))
+        utils.ssh_cmd("ls {}/analysis*zip".format(headnode_dir))
         return True
     except Exception as e:
         return False
 
 
-def get_from_cluster(job_id,
-                     upld_dir,
+def get_from_cluster(upld_dir,
                      headnode_dir):
     """
     Copy zipped analysis file from the computing cluster back to the
@@ -183,16 +182,13 @@ def get_from_cluster(job_id,
 
     Parameters
     -------
-    job_id: str
-        Job ID of which check is made.
     upld_dir: str
         Path to files on the web-service server.
     headnode_dir: str
         Path to files on the computing cluster.
     """
-    sp.check_output("scp headnode:{}{}/analysis*zip {}/job_id".format(headnode_dir,
-                                                                      job_id,
-                                                                      upld_dir),
+    sp.check_output("scp headnode:{}/analysis*zip {}".format(headnode_dir,
+                                                             upld_dir),
                     shell=True)
 
 
@@ -205,8 +201,9 @@ def job():
     for i in pending_ids:
         idle_ns = utils.parse_sinfo(utils.ssh_cmd("sinfo"), "long", "idle")
         idle_phis = utils.parse_sinfo(utils.ssh_cmd("sinfo"), "accel", "idle")
-        upld_dir = "{}{}/".format(settings.MEDIA_URL, i)
-        headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, i)
+        upld_dir = "{}{}/".format(settings.MEDIA_URL, str(i).replace("-", "_"))
+        headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(i).replace("-", "_"))
+        print headnode_dir
         if get_seqs_count(i) > 500000 and idle_phis > 5:
             if queue_submit(i, upld_dir, headnode_dir) is True:
                 change_status(i)
@@ -214,10 +211,11 @@ def job():
             if queue_submit(i, upld_dir, headnode_dir) is True:
                 change_status(i)
     for i in submitted_ids:
-        upld_dir = "{}{}/".format(settings.MEDIA_URL, i)
-        headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, i)
-        if isdone(i) is True:
-            get_from_cluster(i, upld_dir, headnode_dir)
+        upld_dir = "{}{}/".format(settings.MEDIA_URL, str(i).replace("-", "_"))
+        headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(i).replace("-", "_"))
+        print headnode_dir
+        if isdone(headnode_dir) is True:
+            get_from_cluster(upld_dir, headnode_dir)
 
 
 schedule.every(1).seconds.do(job)
