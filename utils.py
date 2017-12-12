@@ -21,7 +21,7 @@ def write_file(input_file,
     Parameters
     -------
     input_file: django.core.files.uploadedfile.UploadedFile
-        Name of the input file.
+        File to be saved.
     path: str
         Path to file save.
     chunk: int, default <8192>
