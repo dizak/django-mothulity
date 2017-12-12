@@ -203,7 +203,6 @@ def job():
         idle_phis = utils.parse_sinfo(utils.ssh_cmd("sinfo"), "accel", "idle")
         upld_dir = "{}{}/".format(settings.MEDIA_URL, str(i).replace("-", "_"))
         headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(i).replace("-", "_"))
-        print headnode_dir
         if get_seqs_count(i) > 500000 and idle_phis > 5:
             if queue_submit(i, upld_dir, headnode_dir) is True:
                 change_status(i)
@@ -213,7 +212,6 @@ def job():
     for i in submitted_ids:
         upld_dir = "{}{}/".format(settings.MEDIA_URL, str(i).replace("-", "_"))
         headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(i).replace("-", "_"))
-        print headnode_dir
         if isdone(headnode_dir) is True:
             get_from_cluster(upld_dir, headnode_dir)
 
