@@ -92,7 +92,10 @@ def parse_sinfo(input_str,
         Number of nodes in desired state and partition.
     """
     s_line = [i for i in input_str.split("\n") if partition in i and state in i]
-    return int(s_line[0].split()[3])
+    try:
+        return int(s_line[0].split()[3])
+    except IndexError:
+        return None
 
 
 def ssh_cmd(cmd,
