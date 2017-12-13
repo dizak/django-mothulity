@@ -56,7 +56,7 @@ class JobStatus(models.Model):
                                on_delete=models.CASCADE)
     job_status = models.CharField(max_length=10)
     slurm_id = models.IntegerField(null=True)
-    retry = models.IntegerField(null=True)
+    retry = models.IntegerField(default=0)
     submission_time = models.DateTimeField("submission time",
                                            default=timezone.now)
 
