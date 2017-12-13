@@ -320,6 +320,8 @@ def job():
             print "Only {} n nodes free. {} n nodes allowed".format(idle_ns,
                                                                     min_ns_free)
     for i in submitted_ids:
+        print "Submitted JobID {}".format(i)
+        print "Retries number {}".format(get_retry(i))
         upld_dir = "{}{}/".format(settings.MEDIA_URL, str(i).replace("-", "_"))
         headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(i).replace("-", "_"))
         if isdone(headnode_dir) is True:
@@ -327,9 +329,11 @@ def job():
             get_from_cluster(upld_dir, headnode_dir)
         if isrunning(i) is False and isdone(headnode_dir) is False and get_retry(i) < max_retry:
             print "JobID {} is NOT done and is NOT runnning. Will be resubmitted".format(i)
+            utils.ssh_cmd("mv {} {}trash/".format(headnode_dir,
+                                                  settings.HEADNODE_PREFIX_URL))
             change_status(i, "pending")
             add_retry(i, get_retry(i) + 1)
-        else:
+        if isrunning(i) is False and isdone(headnode_dir) is False and get_retry(i) >= max_retry:
             print "JobID above retry limit. Changing its status to <dead>"
             change_status(i, "dead")
 
