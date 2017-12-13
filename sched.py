@@ -180,6 +180,30 @@ def add_submission_id(job_id,
     job.save()
 
 
+def isrunning(job_id,
+              status_model=JobStatus):
+    """
+    Check if job is actually running on the computing cluster.
+
+    Parameters
+    ------
+    job_id: str
+        Job ID of job which status should be changed.
+    status_model: django.models.Model, default JobStatus
+        Django model to use.
+
+    Returns
+    -------
+    bool
+        True is submitted ID has <R> state in squeue output.
+    """
+    submission_id = get_submission_id(job_id)
+    if utils.parse_queue(utils.ssh_cmd("squeue"), submission_id, "ST") == "R":
+        return True
+    else:
+        return False
+
+
 def isdone(headnode_dir):
     """
     Check for the zipped analysis on the computing cluster and copy it back if
@@ -243,6 +267,8 @@ def job():
         headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(i).replace("-", "_"))
         if isdone(headnode_dir) is True:
             get_from_cluster(upld_dir, headnode_dir)
+        if isrunning(i) is False and isdone(headnode_dir) is False:
+            print i, " is DEAD"
 
 
 schedule.every(10).seconds.do(job)
