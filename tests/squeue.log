@@ -1,0 +1,3 @@
+JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+1324233     accel     bash   maciek  R 13-09:03:01      1 phi3
+1324490     short     bash  huncwot  R    5:00:01      1 n1
