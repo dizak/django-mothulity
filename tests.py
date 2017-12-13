@@ -47,14 +47,22 @@ class UtilsTests(TestCase):
         self.long_idle_nodes = 61
         self.accel_idle_nodes = 12
         self.accel_alloc_nodes = 3
-        self.JOBID = 1324233
-        self.PARTITION = "accel"
-        self.NAME = "bash"
-        self.USER = "maciek"
-        self.ST = "R"
-        self.TIME = "13-09:03:01"
-        self.NODES = 1
-        self.NODELIST = "phi3"
+        self.JOBID_1 = 1324233
+        self.JOBID_2 = 1324490
+        self.PARTITION_1 = "accel"
+        self.NAME_1 = "bash"
+        self.USER_1 = "maciek"
+        self.ST_1 = "R"
+        self.TIME_1 = "13-09:03:01"
+        self.NODES_1 = 1
+        self.NODELIST_1 = "phi3"
+        self.PARTITION_2 = "short"
+        self.NAME_2 = "bash"
+        self.USER_2 = "huncwot"
+        self.ST_2 = "R"
+        self.TIME_2 = "5:00:01"
+        self.NODES_2 = 1
+        self.NODELIST_2 = "n1"
 
     def test_sniff_true(self):
         """
@@ -118,33 +126,61 @@ class UtilsTests(TestCase):
         with open(self.squeue_file) as fin:
             squeue_str = fin.read()
         self.assertEqual(utils.parse_squeue(squeue_str,
-                                            self.JOBID,
+                                            self.JOBID_1,
                                             "JOBID"),
-                         self.JOBID)
+                         self.JOBID_1)
         self.assertEqual(utils.parse_squeue(squeue_str,
-                                            self.JOBID,
+                                            self.JOBID_1,
                                             "PARTITION"),
-                         self.PARTITION)
+                         self.PARTITION_1)
         self.assertEqual(utils.parse_squeue(squeue_str,
-                                            self.JOBID,
+                                            self.JOBID_1,
                                             "NAME"),
-                         self.NAME)
+                         self.NAME_1)
         self.assertEqual(utils.parse_squeue(squeue_str,
-                                            self.JOBID,
+                                            self.JOBID_1,
                                             "USER"),
-                         self.USER)
+                         self.USER_1)
         self.assertEqual(utils.parse_squeue(squeue_str,
-                                            self.JOBID,
+                                            self.JOBID_1,
                                             "ST"),
-                         self.ST)
+                         self.ST_1)
         self.assertEqual(utils.parse_squeue(squeue_str,
-                                            self.JOBID,
+                                            self.JOBID_1,
                                             "TIME"),
-                         self.TIME)
+                         self.TIME_1)
         self.assertEqual(utils.parse_squeue(squeue_str,
-                                            self.JOBID,
+                                            self.JOBID_1,
                                             "NODELIST"),
-                         self.NODELIST)
+                         self.NODELIST_1)
+        self.assertEqual(utils.parse_squeue(squeue_str,
+                                            self.JOBID_2,
+                                            "JOBID"),
+                         self.JOBID_2)
+        self.assertEqual(utils.parse_squeue(squeue_str,
+                                            self.JOBID_2,
+                                            "PARTITION"),
+                         self.PARTITION_2)
+        self.assertEqual(utils.parse_squeue(squeue_str,
+                                            self.JOBID_2,
+                                            "NAME"),
+                         self.NAME_2)
+        self.assertEqual(utils.parse_squeue(squeue_str,
+                                            self.JOBID_2,
+                                            "USER"),
+                         self.USER_2)
+        self.assertEqual(utils.parse_squeue(squeue_str,
+                                            self.JOBID_2,
+                                            "ST"),
+                         self.ST_2)
+        self.assertEqual(utils.parse_squeue(squeue_str,
+                                            self.JOBID_2,
+                                            "TIME"),
+                         self.TIME_2)
+        self.assertEqual(utils.parse_squeue(squeue_str,
+                                            self.JOBID_2,
+                                            "NODELIST"),
+                         self.NODELIST_2)
 
     def test_ssh_cmd(self):
         """
