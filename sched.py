@@ -19,6 +19,8 @@ from mothulity.models import *
 from mothulity import utils
 
 
+min_ns_free = 30
+min_phis_free = 5
 max_retry = 1
 
 
@@ -297,10 +299,10 @@ def job():
         idle_phis = utils.parse_sinfo(utils.ssh_cmd("sinfo"), "accel", "idle")
         upld_dir = "{}{}/".format(settings.MEDIA_URL, str(i).replace("-", "_"))
         headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(i).replace("-", "_"))
-        if get_seqs_count(i) > 500000 and idle_phis > 5:
+        if get_seqs_count(i) > 500000 and idle_phis > min_phis_free:
             if queue_submit(i, upld_dir, headnode_dir) is True:
                 change_status(i)
-        if get_seqs_count(i) < 500000 and idle_ns > 30:
+        if get_seqs_count(i) < 500000 and idle_ns > min_ns_free:
             if queue_submit(i, upld_dir, headnode_dir) is True:
                 change_status(i)
     for i in submitted_ids:
