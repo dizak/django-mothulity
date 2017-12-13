@@ -308,13 +308,15 @@ def job():
                 change_status(i)
                 print "Submitted {}".format(i)
         else:
-            print "Computing cluster too busy, only {} phi nodes free".format(idle_phis)
+            print "Only {} phi nodes free. {} phi nodes allowed".format(idle_phis,
+                                                                        min_phis_free)
         if get_seqs_count(i) < 500000 and idle_ns > min_ns_free:
             if queue_submit(i, upld_dir, headnode_dir) is True:
                 change_status(i)
                 print "Submitted {}".format(i)
         else:
-            print "Computing cluster too busy, only {} n nodes free".format(idle_ns)
+            print "Only {} n nodes free. {} n nodes allowed".format(idle_ns,
+                                                                    min_ns_free)
     for i in submitted_ids:
         upld_dir = "{}{}/".format(settings.MEDIA_URL, str(i).replace("-", "_"))
         headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(i).replace("-", "_"))
