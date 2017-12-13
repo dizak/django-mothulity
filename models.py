@@ -55,7 +55,7 @@ class JobStatus(models.Model):
     job_id = models.ForeignKey(JobID,
                                on_delete=models.CASCADE)
     job_status = models.CharField(max_length=10)
-    submission_id = models.IntegerField(null=True)
+    slurm_id = models.IntegerField(null=True)
     submission_time = models.DateTimeField("submission time",
                                            default=timezone.now)
 

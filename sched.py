@@ -86,9 +86,9 @@ def get_seqs_count(job_id):
     return job.seqsstats_set.values()[0]["seqs_count"]
 
 
-def get_submission_id(job_id):
+def get_slurm_id(job_id):
     job = get_object_or_404(JobID, job_id=job_id)
-    return job.jobstatus_set.values()[0]["submission_id"]
+    return job.jobstatus_set.values()[0]["slurm_id"]
 
 
 def queue_submit(job_id,
@@ -98,7 +98,7 @@ def queue_submit(job_id,
     """
     Retrieves required data from models by Job ID, renders mothulity command,
     copies files to computing cluster and sends the mothulity command. Adds
-    JobStatus.submission_id after slurm.
+    JobStatus.slurm_id after slurm.
 
     Parameters
     -------
@@ -133,8 +133,8 @@ def queue_submit(job_id,
     if sorted(upld_md5) == sorted(headnode_md5):
         sbatch_out = utils.ssh_cmd(moth_cmd)
         if sbatch_success in sbatch_out:
-            add_submission_id(job_id=job_id,
-                              submission_id=int(sbatch_out.split(" ")[-1]))
+            add_slurm_id(job_id=job_id,
+                              slurm_id=int(sbatch_out.split(" ")[-1]))
             return True
     else:
         return False
@@ -160,9 +160,9 @@ def change_status(job_id,
     job.save()
 
 
-def add_submission_id(job_id,
-                      submission_id,
-                      status_model=JobStatus):
+def add_slurm_id(job_id,
+                 slurm_id,
+                 status_model=JobStatus):
     """
     Adds submission ID to the existing set in the JobStatus model.
 
@@ -170,13 +170,13 @@ def add_submission_id(job_id,
     -------
     job_id: str
         Job ID of job which status should be changed.
-    submission_id: int
+    slurm_id: int
         Submission ID.
     status_model: django.models.Model, default JobStatus
         Django model to use.
     """
     job = status_model.objects.filter(job_id=job_id)[0]
-    job.submission_id = submission_id
+    job.slurm_id = slurm_id
     job.save()
 
 
@@ -197,8 +197,8 @@ def isrunning(job_id,
     bool
         True is submitted ID has <R> state in squeue output.
     """
-    submission_id = get_submission_id(job_id)
-    if utils.parse_queue(utils.ssh_cmd("squeue"), submission_id, "ST") == "R":
+    slurm_id = get_slurm_id(job_id)
+    if utils.parse_queue(utils.ssh_cmd("squeue"), slurm_id, "ST") == "R":
         return True
     else:
         return False
@@ -262,7 +262,7 @@ def job():
             if queue_submit(i, upld_dir, headnode_dir) is True:
                 change_status(i)
     for i in submitted_ids:
-        print get_submission_id(i)
+        print get_slurm_id(i)
         upld_dir = "{}{}/".format(settings.MEDIA_URL, str(i).replace("-", "_"))
         headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(i).replace("-", "_"))
         if isdone(headnode_dir) is True:
