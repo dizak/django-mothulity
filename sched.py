@@ -303,6 +303,8 @@ def job():
         idle_phis = utils.parse_sinfo(utils.ssh_cmd("sinfo"), "accel", "idle")
         upld_dir = "{}{}/".format(settings.MEDIA_URL, str(i).replace("-", "_"))
         headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(i).replace("-", "_"))
+        print "Files of JobID {} in {} on web-server".format(i, upld_dir)
+        print "Files of JobID {} in {} on computing cluster".format(i, headnode_dir)
         if get_seqs_count(i) > 500000 and idle_phis > min_phis_free:
             if queue_submit(i, upld_dir, headnode_dir) is True:
                 change_status(i)
@@ -329,7 +331,7 @@ def job():
             add_retry(i, get_retry(i) + 1)
 
 
-schedule.every(10).seconds.do(job)
+schedule.every(5).seconds.do(job)
 
 
 def main():
