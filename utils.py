@@ -148,8 +148,7 @@ def parse_squeue(input_str,
                  "USER": str(s_line[0].split()[3]),
                  "ST": str(s_line[0].split()[4]),
                  "TIME": str(s_line[0].split()[5]),
-                 "NODES": int(s_line[0].split()[6]),
-                 "NODELIST": str(s_line[0].split()[7])}
+                 "NODES": int(s_line[0].split()[6])}
     if cols_vals["JOBID"] == int(slurm_id):
         return cols_vals[key]
 
