@@ -19,6 +19,9 @@ from mothulity.models import *
 from mothulity import utils
 
 
+max_retry = 1
+
+
 def get_pending_ids(ids_quantity=20,
                     status="pending",
                     status_model=JobStatus):
@@ -91,6 +94,25 @@ def get_slurm_id(job_id):
     return job.jobstatus_set.values()[0]["slurm_id"]
 
 
+def get_retry(job_id):
+    """
+    Returns number of retry from JobStatus model.
+
+    Parameters
+    -------
+    job_id: str
+        Job ID by which sequece count is returned.
+
+    Returns
+    -------
+    int
+        Retry number.
+    """
+    job = get_object_or_404(JobID, job_id=job_id)
+    return job.jobstatus_set.values()[0]["retry"]
+
+
+
 def queue_submit(job_id,
                  upld_dir,
                  headnode_dir,
@@ -134,7 +156,7 @@ def queue_submit(job_id,
         sbatch_out = utils.ssh_cmd(moth_cmd)
         if sbatch_success in sbatch_out:
             add_slurm_id(job_id=job_id,
-                              slurm_id=int(sbatch_out.split(" ")[-1]))
+                         slurm_id=int(sbatch_out.split(" ")[-1]))
             return True
     else:
         return False
@@ -177,6 +199,26 @@ def add_slurm_id(job_id,
     """
     job = status_model.objects.filter(job_id=job_id)[0]
     job.slurm_id = slurm_id
+    job.save()
+
+
+def add_retry(job_id,
+              retry,
+              status_model=JobStatus):
+    """
+    Adds retry existing set in the JobStatus model.
+
+    Parameters
+    -------
+    job_id: str
+        Job ID of job which status should be changed.
+    retry: int
+        Retry number.
+    status_model: django.models.Model, default JobStatus
+        Django model to use.
+    """
+    job = status_model.objects.filter(job_id=job_id)[0]
+    job.retry = retry
     job.save()
 
 
@@ -267,8 +309,9 @@ def job():
         headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(i).replace("-", "_"))
         if isdone(headnode_dir) is True:
             get_from_cluster(upld_dir, headnode_dir)
-        if isrunning(i) is False and isdone(headnode_dir) is False:
-            print i, " is DEAD"
+        if isrunning(i) is False and isdone(headnode_dir) is False and get_retry(i) < max_retry:
+            change_status(i, "pending")
+            add_retry(i, 1)
 
 
 schedule.every(10).seconds.do(job)
