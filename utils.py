@@ -90,8 +90,8 @@ def parse_sinfo(input_str,
 
     Parameters
     -------
-    input_file: str
-        Path to input file.
+    input_str: str
+        Output of the sinfo command.
     partition: str
         Partition of desired nodes.
     state: str
@@ -110,6 +110,46 @@ def parse_sinfo(input_str,
         return int(s_line[0].split()[3])
     except IndexError:
         return None
+
+
+def parse_queue(input_str,
+                submission_id,
+                key="ST"):
+    """
+    Parse squeue command output and return desired information.
+
+    Parameters
+    -------
+    input_str: str
+        Output of the squeue command.
+    submission_id: str or int
+        slurm's ID of submitted job.
+    key: str or int
+        Desired value of squeue line to return
+
+    Returns
+    -------
+    str or int
+        Desired value of selected column and row from squeue command.
+    None
+        Returns None if record not found.
+    """
+    s_line = [i for i in input_str.split("\n") if str(submission_id) in i]
+    if len(s_line) > 1:
+        raise ParserError("""Found more than one line matching. Check if squeue
+              command output has not been changed.""")
+    elif len(s_line) == 0:
+        return None
+    cols_vals = {"JOBID": int(s_line[0].split()[0]),
+                 "PARTITION": str(s_line[0].split()[1]),
+                 "NAME": str(s_line[0].split()[2]),
+                 "USER": str(s_line[0].split()[3]),
+                 "ST": str(s_line[0].split()[4]),
+                 "TIME": str(s_line[0].split()[5]),
+                 "NODES": int(s_line[0].split()[6]),
+                 "NODELIST": str(s_line[0].split()[7])}
+    if cols_vals["JOBID"] == int(submission_id):
+        return cols_vals[key]
 
 
 def ssh_cmd(cmd,
