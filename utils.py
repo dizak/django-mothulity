@@ -114,9 +114,9 @@ def parse_sinfo(input_str,
         return None
 
 
-def parse_queue(input_str,
-                slurm_id,
-                key="ST"):
+def parse_squeue(input_str,
+                 slurm_id,
+                 key="ST"):
     """
     Parse squeue command output and return desired information.
 

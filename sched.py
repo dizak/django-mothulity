@@ -245,7 +245,7 @@ def isrunning(job_id,
         True is submitted ID has <R> state in squeue output.
     """
     slurm_id = get_slurm_id(job_id)
-    if utils.parse_queue(utils.ssh_cmd("squeue"), slurm_id, "ST") == "R":
+    if utils.parse_squeue(utils.ssh_cmd("squeue"), slurm_id, "ST") == "R":
         return True
     else:
         return False
