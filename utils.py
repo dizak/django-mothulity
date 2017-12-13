@@ -103,9 +103,11 @@ def parse_sinfo(input_str,
         Number of nodes in desired state and partition.
     """
     s_line = [i for i in input_str.split("\n") if partition in i and state in i]
-    if len(s_line) != 1:
-        raise ParserError("""Found more or less than one line matching. Check if
-              sinfo command output has not been changed.""")
+    if len(s_line) > 1:
+        raise ParserError("""Found more than one line matching. Check if sinfo
+              command output has not been changed.""")
+    elif len(s_line) == 0:
+        return None
     try:
         return int(s_line[0].split()[3])
     except IndexError:
