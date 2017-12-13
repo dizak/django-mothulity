@@ -19,7 +19,7 @@ from mothulity.models import *
 from mothulity import utils
 
 
-min_ns_free = 30
+min_ns_free = 20
 min_phis_free = 5
 max_retry = 1
 
@@ -154,8 +154,11 @@ def queue_submit(job_id,
                     shell=True)
     upld_md5 = utils.md5sum("{}*".format(upld_dir))
     headnode_md5 = utils.md5sum("{}*".format(headnode_dir), remote=True)
+    print upld_md5
+    print headnode_md5
     if sorted(upld_md5) == sorted(headnode_md5):
         sbatch_out = utils.ssh_cmd(moth_cmd)
+        print sbatch_out
         if sbatch_success in sbatch_out:
             add_slurm_id(job_id=job_id,
                          slurm_id=int(sbatch_out.split(" ")[-1]))
@@ -295,6 +298,7 @@ def job():
     pending_ids = get_pending_ids()
     submitted_ids = get_submitted_ids()
     for i in pending_ids:
+        print "Pending JobID {}".format(i)
         idle_ns = utils.parse_sinfo(utils.ssh_cmd("sinfo"), "long", "idle")
         idle_phis = utils.parse_sinfo(utils.ssh_cmd("sinfo"), "accel", "idle")
         upld_dir = "{}{}/".format(settings.MEDIA_URL, str(i).replace("-", "_"))
@@ -302,16 +306,23 @@ def job():
         if get_seqs_count(i) > 500000 and idle_phis > min_phis_free:
             if queue_submit(i, upld_dir, headnode_dir) is True:
                 change_status(i)
+                print "Submitted {}".format(i)
+        else:
+            print "Computing cluster too busy, only {} phi nodes free".format(idle_phis)
         if get_seqs_count(i) < 500000 and idle_ns > min_ns_free:
             if queue_submit(i, upld_dir, headnode_dir) is True:
                 change_status(i)
+                print "Submitted {}".format(i)
+        else:
+            print "Computing cluster too busy, only {} n nodes free".format(idle_ns)
     for i in submitted_ids:
-        print get_slurm_id(i)
         upld_dir = "{}{}/".format(settings.MEDIA_URL, str(i).replace("-", "_"))
         headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(i).replace("-", "_"))
         if isdone(headnode_dir) is True:
+            print "JobID {} is done".format(i)
             get_from_cluster(upld_dir, headnode_dir)
         if isrunning(i) is False and isdone(headnode_dir) is False and get_retry(i) < max_retry:
+            print "JobID {} is NOT done and is NOT runnning. Will be resubmitted".format(i)
             change_status(i, "pending")
             add_retry(i, 1)
 
