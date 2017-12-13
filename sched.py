@@ -326,7 +326,7 @@ def job():
         if isrunning(i) is False and isdone(headnode_dir) is False and get_retry(i) < max_retry:
             print "JobID {} is NOT done and is NOT runnning. Will be resubmitted".format(i)
             change_status(i, "pending")
-            add_retry(i, 1)
+            add_retry(i, int(get_retry(i) + 1))
 
 
 schedule.every(10).seconds.do(job)
