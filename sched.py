@@ -329,6 +329,9 @@ def job():
             print "JobID {} is NOT done and is NOT runnning. Will be resubmitted".format(i)
             change_status(i, "pending")
             add_retry(i, get_retry(i) + 1)
+        else:
+            print "JobID above retry limit. Changing its status to <dead>"
+            change_status(i, "dead")
 
 
 schedule.every(5).seconds.do(job)
