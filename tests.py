@@ -43,9 +43,18 @@ class UtilsTests(TestCase):
         self.cmd = "uname"
         self.cmd_out = "Linux"
         self.sinfo_file = "mothulity/tests/sinfo.log"
+        self.squeue_file = "mothulity/tests/squeue.log"
         self.long_idle_nodes = 61
         self.accel_idle_nodes = 12
         self.accel_alloc_nodes = 3
+        self.JOBID = 1324233
+        self.PARTITION = "accel"
+        self.NAME = "bash"
+        self.USER = "maciek"
+        self.ST = "R"
+        self.TIME = "13-09:03:01"
+        self.NODES = 1
+        self.NODELIST = "phi3"
 
     def test_sniff_true(self):
         """
@@ -101,6 +110,41 @@ class UtilsTests(TestCase):
                                            partition="accel",
                                            state="alloc"),
                          self.accel_alloc_nodes)
+
+    def test_parse_squeue(self):
+        """
+        Test whether squeue log file returns expected values
+        """
+        with open(self.squeue_file) as fin:
+            squeue_str = fin.read()
+        self.assertEqual(utils.parse_squeue(squeue_str,
+                                            self.JOBID,
+                                            "JOBID"),
+                         self.JOBID)
+        self.assertEqual(utils.parse_squeue(squeue_str,
+                                            self.JOBID,
+                                            "PARTITION"),
+                         self.PARTITION)
+        self.assertEqual(utils.parse_squeue(squeue_str,
+                                            self.JOBID,
+                                            "NAME"),
+                         self.NAME)
+        self.assertEqual(utils.parse_squeue(squeue_str,
+                                            self.JOBID,
+                                            "USER"),
+                         self.USER)
+        self.assertEqual(utils.parse_squeue(squeue_str,
+                                            self.JOBID,
+                                            "ST"),
+                         self.ST)
+        self.assertEqual(utils.parse_squeue(squeue_str,
+                                            self.JOBID,
+                                            "TIME"),
+                         self.TIME)
+        self.assertEqual(utils.parse_squeue(squeue_str,
+                                            self.JOBID,
+                                            "NODELIST"),
+                         self.NODELIST)
 
     def test_ssh_cmd(self):
         """
