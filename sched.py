@@ -289,6 +289,7 @@ def get_from_cluster(upld_dir,
     sp.check_output("scp headnode:{}/analysis*zip {}".format(headnode_dir,
                                                              upld_dir),
                     shell=True)
+    sp.call("unzip {}analysis*zip".format(upld_dir), shell=True)
 
 
 def job():
