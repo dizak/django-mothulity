@@ -254,6 +254,7 @@ def render_moth_cmd(moth_exec="mothulity.py",
     for i in pop_elems:
         moth_opts.pop(i)
     moth_opts["run"] = shell
+    moth_opts["output-dir"] = moth_files
     moth_opt_str = " ".join(["--{} {}".format(k.replace("_", "-"), v)
                              for k, v in moth_opts.items()])
     return "{} {} {}".format(moth_exec,
