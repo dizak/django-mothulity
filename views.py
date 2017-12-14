@@ -99,19 +99,9 @@ def submit(request,
     if request.method == "POST":
         form = OptionsForm(request.POST)
         if form.is_valid():
+            form_data = form.cleaned_data
             job = get_object_or_404(JobID, job_id=job)
-            job.submissiondata_set.create(job_name=request.POST["job_name"],
-                                          notify_email=request.POST["notify_email"],
-                                          max_ambig=request.POST["max_ambig"],
-                                          max_homop=request.POST["max_homop"],
-                                          min_length=request.POST["min_length"],
-                                          max_length=request.POST["max_length"],
-                                          min_overlap=request.POST["min_overlap"],
-                                          screen_criteria=request.POST["screen_criteria"],
-                                          chop_length=request.POST["chop_length"],
-                                          precluster_diffs=request.POST["precluster_diffs"],
-                                          classify_seqs_cutoff=request.POST["classify_seqs_cutoff"],
-                                          amplicon_type=request.POST["amplicon_type"])
+            job.submissiondata_set.create(**form_data)
             job.jobstatus_set.create(job_status="pending")
             return render(request,
                           "mothulity/submit.html.jj2",
