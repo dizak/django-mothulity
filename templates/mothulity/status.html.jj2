@@ -7,7 +7,19 @@
     <h1>Hello from status page!</h1>
   </article>
   <article class="w3-container w3-margin w3-card-8 w3-white">
-    <h1>Your job is:</h1>
-    <p>{{ job_id }}</p>
+    <h2>Your job is {{ jobstatus.job_status }}</h2>
+    {% if jobstatus.job_status == "pending" %}
+      <p>It means it is waiting for resources allocation on the computing cluster.</p>
+    {% elif jobstatus.job_status == "submitted" %}
+      <p>It means it is processed by the computing cluster.</p>
+    {% elif jobstatus.job_status == "dead" %}
+      <p>Sorry, your job was not finished despite being processed {{ max_retry }} times.</p>
+      <p>It can be caused by:</p>
+      <ul>
+        <li>setting invalid analysis parameters</li>
+        <li>problems with the sequences themselves</li>
+      </ul>
+      <p>It will NOT be resubmitted automatically again.</p>
+    {% endif %}
   </article>
 {% endblock %}

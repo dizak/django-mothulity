@@ -5,6 +5,7 @@ from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from mothulity.forms import FileFieldForm, OptionsForm
 from mothulity.models import *
+from mothulity.sched import max_retry
 import utils
 import uuid
 import subprocess as sp
@@ -127,6 +128,8 @@ def submit(request,
 def status(request,
            job):
     job = get_object_or_404(JobID, job_id=job)
+    jobstatus = job.jobstatus_set.values()[0]
     return render(request,
                   "mothulity/status.html.jj2",
-                  {"job_id": job.job_id})
+                  {"jobstatus": jobstatus,
+                   "max_retry": max_retry})
