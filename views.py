@@ -5,7 +5,7 @@ from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from mothulity.forms import FileFieldForm, OptionsForm
 from mothulity.models import *
-from mothulity.sched import max_retry
+from mothulity.sched import max_retry, isdone
 import utils
 import uuid
 import subprocess as sp
@@ -128,8 +128,18 @@ def submit(request,
 def status(request,
            job):
     job = get_object_or_404(JobID, job_id=job)
+    submissiondata = job.submissiondata_set.values()[0]
     jobstatus = job.jobstatus_set.values()[0]
+    upld_dir = "{}{}/".format(settings.MEDIA_URL, str(job.job_id).replace("-", "_"))
+    headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(job.job_id).replace("-", "_"))
+    if isdone(headnode_dir):
+        results_url = "{}{}/analysis/analysis_{}.html".format(upld_dir,
+                                                              job.job_id.replace("-", "_"),
+                                                              submissiondata["job_name"])
+    else:
+        results_url = None
     return render(request,
                   "mothulity/status.html.jj2",
                   {"jobstatus": jobstatus,
-                   "max_retry": max_retry})
+                   "max_retry": max_retry,
+                   "results_url": results_url})
