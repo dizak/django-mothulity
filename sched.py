@@ -114,7 +114,6 @@ def get_retry(job_id):
     return job.jobstatus_set.values()[0]["retry"]
 
 
-
 def queue_submit(job_id,
                  upld_dir,
                  headnode_dir,
