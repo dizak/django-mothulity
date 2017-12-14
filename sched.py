@@ -149,9 +149,12 @@ def queue_submit(job_id,
         sub_data["processors"] = 12
     moth_cmd = utils.render_moth_cmd(moth_files=headnode_dir,
                                      moth_opts=sub_data)
-    sp.check_output("scp -r {} headnode:{}".format(upld_dir,
-                                                   settings.HEADNODE_PREFIX_URL),
-                    shell=True)
+    try:
+        sp.check_output("scp -r {} headnode:{}".format(upld_dir,
+                                                       settings.HEADNODE_PREFIX_URL),
+                        shell=True)
+    except Exception as e:
+        print "Could not copy to computing cluster"
     upld_md5 = utils.md5sum("{}*".format(upld_dir))
     headnode_md5 = utils.md5sum("{}*".format(headnode_dir), remote=True)
     print upld_md5
