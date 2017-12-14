@@ -339,7 +339,7 @@ def job():
         if isdone(headnode_dir) is True:
             print "JobID {} is done".format(i)
             get_from_cluster(upld_dir, headnode_dir)
-
+            change_status(i, "done")
 
 
 schedule.every(5).seconds.do(job)
