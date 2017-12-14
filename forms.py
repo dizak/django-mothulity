@@ -91,3 +91,7 @@ class OptionsForm(forms.Form):
             self._errors["min_length"] = ["min_length > max_length"]
             self._errors["max_length"] = ["max_length < min_length"]
             del self.cleaned_data["min_length"]
+
+    def clean_job_name(self):
+        self.cleaned_data["job_name"] = self.cleaned_data["job_name"].replace("-", "_")
+        return self.cleaned_data["job_name"]
