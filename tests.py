@@ -8,7 +8,7 @@ import pytz
 from io import BytesIO
 import os
 import uuid
-from mothulity import views, models, utils, sched
+from mothulity import views, models, forms, utils, sched
 
 
 class UtilsTests(TestCase):
@@ -150,10 +150,6 @@ class UtilsTests(TestCase):
                                             "TIME"),
                          self.TIME_1)
         self.assertEqual(utils.parse_squeue(squeue_str,
-                                            self.JOBID_1,
-                                            "NODELIST"),
-                         self.NODELIST_1)
-        self.assertEqual(utils.parse_squeue(squeue_str,
                                             self.JOBID_2,
                                             "JOBID"),
                          self.JOBID_2)
@@ -177,10 +173,6 @@ class UtilsTests(TestCase):
                                             self.JOBID_2,
                                             "TIME"),
                          self.TIME_2)
-        self.assertEqual(utils.parse_squeue(squeue_str,
-                                            self.JOBID_2,
-                                            "NODELIST"),
-                         self.NODELIST_2)
 
     def test_ssh_cmd(self):
         """
@@ -289,5 +281,36 @@ class ModelsTest(TestCase):
                                                              precluster_diffs=self.test_precluster_diffs,
                                                              classify_seqs_cutoff=self.test_classify_seqs_cutoff,
                                                              amplicon_type=self.test_amplicon_type)
-        self.assertIs(submissiondata.job_name,
-                      self.test_job_name.replace("-", "_"))
+        self.assertIs(submissiondata.job_name, self.test_job_name)
+
+
+class FormsTest(TestCase):
+    """
+    Tests for the forms.
+    """
+    def setUp(self):
+        """
+        Sets up class level attrubutes for the tests.
+        """
+        self.form_data = {"job_name": "test-job",
+                          "notify_email": "test@mail.com",
+                          "max_ambig": 0,
+                          "max_homop": 8,
+                          "min_length": 100,
+                          "max_length": 200,
+                          "min_overlap": 10,
+                          "screen_criteria": 95,
+                          "chop_length": 250,
+                          "precluster_diffs": 2,
+                          "classify_seqs_cutoff": 80,
+                          "amplicon_type": "16S"}
+        self.clean_job_name = self.form_data["job_name"].replace("-", "_")
+
+    def test_form_validity(self):
+        form = forms.OptionsForm(self.form_data)
+        self.assertTrue(form.is_valid())
+
+    def test_form_sanitize(self):
+        form = forms.OptionsForm(self.form_data)
+        if form.is_valid():
+            self.assertEqual(form.cleaned_data["job_name"], self.clean_job_name)
