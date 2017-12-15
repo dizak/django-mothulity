@@ -24,7 +24,7 @@ min_ns_free = 20
 min_phis_free = 5
 max_retry = 1
 files_to_copy = ["*shared",
-                 "*tax.summary"]
+                 "*cons.tax.summary"]
 
 
 def get_pending_ids(ids_quantity=20,
@@ -351,14 +351,14 @@ def job():
         print "\nJobID {} Status: done. Trying to copy.\n".format(i)
         upld_dir = "{}{}/".format(settings.MEDIA_URL, str(i).replace("-", "_"))
         headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(i).replace("-", "_"))
-        try:
-            for i in files_to_copy:
-                get_from_cluster(filename=i,
+        for ii in files_to_copy:
+            try:
+                get_from_cluster(filename=ii,
                                  upld_dir=upld_dir,
                                  headnode_dir=headnode_dir)
-            change_status(i, "closed")
-        except Exception as e:
-            print "File not found"
+            except Exception as e:
+                print "File not found"
+        change_status(i, "closed")
 
 
 schedule.every(5).seconds.do(job)
