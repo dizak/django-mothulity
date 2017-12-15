@@ -23,6 +23,8 @@ from mothulity import utils
 min_ns_free = 20
 min_phis_free = 5
 max_retry = 1
+files_to_copy = ["*shared",
+                 "*tax.summary"]
 
 
 def get_pending_ids(ids_quantity=20,
@@ -304,7 +306,7 @@ def job():
     Retrieve pending jobs and submit them properly to the computing cluster.
     """
     for i in get_pending_ids():
-        print "\nJobID {} status pending\n".format(i)
+        print "\nJobID {} Status: pending\n".format(i)
         idle_ns = utils.parse_sinfo(utils.ssh_cmd("sinfo"), "long", "idle")
         idle_phis = utils.parse_sinfo(utils.ssh_cmd("sinfo"), "accel", "idle")
         upld_dir = "{}{}/".format(settings.MEDIA_URL, str(i).replace("-", "_"))
@@ -326,8 +328,8 @@ def job():
                 print "Only {} n nodes free. {} n nodes allowed".format(idle_ns,
                                                                         min_ns_free)
     for i in get_ids_with_status("submitted"):
-        print "\nJobID {} status submitted\n".format(i)
-        print "Retries number {}".format(get_retry(i))
+        print "\nJobID {} Status: submitted. Retries: {}\n".format(i,
+                                                                   get_retry(i))
         upld_dir = "{}{}/".format(settings.MEDIA_URL, str(i).replace("-", "_"))
         headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(i).replace("-", "_"))
         if isrunning(i) is False and isdone(headnode_dir, filename="*shared") is False and get_retry(i) >= max_retry:
@@ -346,13 +348,14 @@ def job():
             change_status(i, "done")
             break
     for i in get_ids_with_status("done"):
-        print "\nJobID {} status done. Trying to copy.\n".format(i)
+        print "\nJobID {} Status: done. Trying to copy.\n".format(i)
         upld_dir = "{}{}/".format(settings.MEDIA_URL, str(i).replace("-", "_"))
         headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(i).replace("-", "_"))
         try:
-            get_from_cluster(filename="*zip",
-                             upld_dir=upld_dir,
-                             headnode_dir=headnode_dir)
+            for i in files_to_copy:
+                get_from_cluster(filename=i,
+                                 upld_dir=upld_dir,
+                                 headnode_dir=headnode_dir)
             change_status(i, "closed")
         except Exception as e:
             print "File not found"
