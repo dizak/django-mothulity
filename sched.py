@@ -297,9 +297,10 @@ def get_from_cluster(filename,
         Path to files on the computing cluster.
     """
     sp.call("scp headnode:{}{} {}".format(headnode_dir,
-                                                   filename,
-                                                   upld_dir),
+                                          filename,
+                                          upld_dir),
             shell=True)
+
 
 def job():
     """
