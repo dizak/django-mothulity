@@ -54,10 +54,10 @@ def get_pending_ids(ids_quantity=20,
         return ids[:ids_quantity]
 
 
-def get_submitted_ids(status="submitted",
-                      status_model=JobStatus):
+def get_ids_with_status(status="submitted",
+                        status_model=JobStatus):
     """
-    Returns Job IDs of submitted jobs
+    Returns Job IDs of jobs with given status.
 
     Parameters
     -------
@@ -277,7 +277,8 @@ def isdone(headnode_dir,
         return False
 
 
-def get_from_cluster(upld_dir,
+def get_from_cluster(filename,
+                     upld_dir,
                      headnode_dir):
     """
     Copy zipped analysis file from the computing cluster back to the
@@ -285,23 +286,25 @@ def get_from_cluster(upld_dir,
 
     Parameters
     -------
+    filename: str
+        Name of file to copy. Glob is accepted.
     upld_dir: str
         Path to files on the web-service server.
     headnode_dir: str
         Path to files on the computing cluster.
     """
-    sp.check_output("scp headnode:{}/analysis*zip {}".format(headnode_dir,
-                                                             upld_dir),
-                    shell=True)
-    sp.call("unzip {}analysis*zip".format(upld_dir), shell=True)
-
+    sp.call("scp headnode:{}{} {}".format(headnode_dir,
+                                                   filename,
+                                                   upld_dir),
+            shell=True)
 
 def job():
     """
     Retrieve pending jobs and submit them properly to the computing cluster.
     """
     pending_ids = get_pending_ids()
-    submitted_ids = get_submitted_ids()
+    submitted_ids = get_ids_with_status("submitted")
+    done_ids = get_ids_with_status("done")
     for i in pending_ids:
         print "Pending JobID {}".format(i)
         idle_ns = utils.parse_sinfo(utils.ssh_cmd("sinfo"), "long", "idle")
@@ -340,8 +343,18 @@ def job():
             add_retry(i, get_retry(i) + 1)
         if isrunning(i) is False and isdone(headnode_dir, filename="*shared") is True:
             print "JobID {} is done".format(i)
-            # get_from_cluster(upld_dir, headnode_dir)
             change_status(i, "done")
+    for i in done_ids:
+        print "JobID {} is done. Trying to copy.".format(i)
+        upld_dir = "{}{}/".format(settings.MEDIA_URL, str(i).replace("-", "_"))
+        headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(i).replace("-", "_"))
+        try:
+            get_from_cluster(filename="*zip",
+                             upld_dir=upld_dir,
+                             headnode_dir=headnode_dir)
+            change_status(i, "closed")
+        except Exception as e:
+            print "File not found"
 
 
 schedule.every(5).seconds.do(job)
