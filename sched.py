@@ -304,29 +304,29 @@ def job():
     Retrieve pending jobs and submit them properly to the computing cluster.
     """
     for i in get_pending_ids():
-        print "Pending JobID {}".format(i)
+        print "\nJobID {} status pending\n".format(i)
         idle_ns = utils.parse_sinfo(utils.ssh_cmd("sinfo"), "long", "idle")
         idle_phis = utils.parse_sinfo(utils.ssh_cmd("sinfo"), "accel", "idle")
         upld_dir = "{}{}/".format(settings.MEDIA_URL, str(i).replace("-", "_"))
         headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(i).replace("-", "_"))
-        print "Files of JobID {} in {} on web-server".format(i, upld_dir)
-        print "Files of JobID {} in {} on computing cluster".format(i, headnode_dir)
+        print "JobID {} files {} - web-server".format(i, upld_dir)
+        print "JobID {} files {} - computing cluster".format(i, headnode_dir)
         if get_seqs_count(i) > 500000 and idle_phis > min_phis_free:
             if queue_submit(i, upld_dir, headnode_dir) is True:
                 change_status(i)
-                print "Submitted {}".format(i)
+                print "JobID {} submitted".format(i)
             else:
                 print "Only {} phi nodes free. {} phi nodes allowed".format(idle_phis,
                                                                             min_phis_free)
         if get_seqs_count(i) < 500000 and idle_ns > min_ns_free:
             if queue_submit(i, upld_dir, headnode_dir) is True:
                 change_status(i)
-                print "Submitted {}".format(i)
+                print "JobID {} submitted".format(i)
             else:
                 print "Only {} n nodes free. {} n nodes allowed".format(idle_ns,
                                                                         min_ns_free)
     for i in get_ids_with_status("submitted"):
-        print "Submitted JobID {}".format(i)
+        print "\nJobID {} status submitted\n".format(i)
         print "Retries number {}".format(get_retry(i))
         upld_dir = "{}{}/".format(settings.MEDIA_URL, str(i).replace("-", "_"))
         headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(i).replace("-", "_"))
@@ -346,7 +346,7 @@ def job():
             change_status(i, "done")
             break
     for i in get_ids_with_status("done"):
-        print "JobID {} is done. Trying to copy.".format(i)
+        print "\nJobID {} status done. Trying to copy.\n".format(i)
         upld_dir = "{}{}/".format(settings.MEDIA_URL, str(i).replace("-", "_"))
         headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(i).replace("-", "_"))
         try:
