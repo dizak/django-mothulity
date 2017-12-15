@@ -271,7 +271,7 @@ def isdone(headnode_dir,
         True if file exists or False if it does not.
     """
     try:
-        utils.ssh_cmd("ls {}/{}".format(headnode_dir, filename))
+        utils.ssh_cmd("ls {}{}".format(headnode_dir, filename))
         return True
     except Exception as e:
         return False
