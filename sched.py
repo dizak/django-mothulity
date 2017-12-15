@@ -6,6 +6,7 @@ import sys
 import schedule
 import subprocess as sp
 from glob import glob
+from time import sleep
 
 import django
 from django.conf import settings
@@ -253,7 +254,8 @@ def isrunning(job_id,
         return False
 
 
-def isdone(headnode_dir):
+def isdone(headnode_dir,
+           filename="analysis*zip"):
     """
     Check for the zipped analysis on the computing cluster and copy it back if
     it exists or return False otherwise.
@@ -269,7 +271,7 @@ def isdone(headnode_dir):
         True if file exists or False if it does not.
     """
     try:
-        utils.ssh_cmd("ls {}/analysis*zip".format(headnode_dir))
+        utils.ssh_cmd("ls {}/{}".format(headnode_dir, filename))
         return True
     except Exception as e:
         return False
@@ -327,18 +329,18 @@ def job():
         print "Retries number {}".format(get_retry(i))
         upld_dir = "{}{}/".format(settings.MEDIA_URL, str(i).replace("-", "_"))
         headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(i).replace("-", "_"))
-        if isrunning(i) is False and isdone(headnode_dir) is False and get_retry(i) >= max_retry:
+        if isrunning(i) is False and isdone(headnode_dir, filename="*shared") is False and get_retry(i) >= max_retry:
             print "JobID above retry limit. Changing its status to <dead>"
             change_status(i, "dead")
-        if isrunning(i) is False and isdone(headnode_dir) is False and get_retry(i) < max_retry:
+        if isrunning(i) is False and isdone(headnode_dir, filename="*shared") is False and get_retry(i) < max_retry:
             print "JobID {} is NOT done and is NOT runnning. Will be resubmitted".format(i)
             utils.ssh_cmd("mv {} {}trash/".format(headnode_dir,
                                                   settings.HEADNODE_PREFIX_URL))
             change_status(i, "pending")
             add_retry(i, get_retry(i) + 1)
-        if isdone(headnode_dir) is True:
+        if isrunning(i) is False and isdone(headnode_dir, filename="*shared") is True:
             print "JobID {} is done".format(i)
-            get_from_cluster(upld_dir, headnode_dir)
+            # get_from_cluster(upld_dir, headnode_dir)
             change_status(i, "done")
 
 
