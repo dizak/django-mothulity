@@ -155,6 +155,7 @@ def queue_submit(job_id,
                         shell=True)
     except Exception as e:
         print "Could not copy to computing cluster"
+        return False
     upld_md5 = utils.md5sum("{}*".format(upld_dir))
     headnode_md5 = utils.md5sum("{}*".format(headnode_dir), remote=True)
     print upld_md5
