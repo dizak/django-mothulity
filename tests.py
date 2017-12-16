@@ -233,7 +233,7 @@ class ModelsTest(TestCase):
                                      "precluster_diffs": 2,
                                      "classify_seqs_cutoff": 80,
                                      "amplicon_type": "16S"}
-        self.test_seqs_count = 17,
+        self.test_seqs_count = 42
         self.test_job_status = "pending"
         self.test_submission_time = timezone.now()
         self.j_id = models.JobID(job_id=self.test_job_id)
