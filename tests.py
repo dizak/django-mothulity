@@ -221,19 +221,19 @@ class ModelsTest(TestCase):
             UUID created ad hoc and converted into str.
         """
         self.test_job_id = str(uuid.uuid4())
-        self.test_job_name = "test-job"
-        self.test_notify_email = "test@mail.com"
-        self.test_max_ambig = 0
-        self.test_max_homop = 8
-        self.test_min_length = 100
-        self.test_max_length = 200
-        self.test_min_overlap = 10
-        self.test_screen_criteria = 95
-        self.test_chop_length = 250
-        self.test_precluster_diffs = 2
-        self.test_classify_seqs_cutoff = 80
-        self.test_amplicon_type = "16S"
-        self.test_seqs_count = 17
+        self.submission_data_dict = {"job_name": "test-job",
+                                     "notify_email": "test@mail.com",
+                                     "max_ambig": 0,
+                                     "max_homop": 8,
+                                     "min_length": 100,
+                                     "max_length": 200,
+                                     "min_overlap": 10,
+                                     "screen_criteria": 95,
+                                     "chop_length": 250,
+                                     "precluster_diffs": 2,
+                                     "classify_seqs_cutoff": 80,
+                                     "amplicon_type": "16S"}
+        self.test_seqs_count = 17,
         self.test_job_status = "pending"
         self.test_submission_time = timezone.now()
         self.j_id = models.JobID(job_id=self.test_job_id)
@@ -251,16 +251,20 @@ class ModelsTest(TestCase):
         Tests whether job_id is properly saved and retrieved into and from the
         model as well as creation of seqsstats_set connected with the job_id.
         """
-        stats = self.j_id.seqsstats_set.create(seqs_count=self.test_seqs_count)
-        self.assertIs(stats.seqs_count, self.test_seqs_count)
+        stats = models.SeqsStats(job_id=self.j_id,
+                                 seqs_count=self.test_seqs_count)
+        stats.save()
+        self.assertEqual(stats.seqs_count, self.test_seqs_count)
 
     def test_jobstatus(self):
         """
         Tests whether job_status and submission_time are properly saved and
         retrieved.
         """
-        status = self.j_id.jobstatus_set.create(job_status=self.test_job_status,
-                                                submission_time=self.test_submission_time)
+        status = models.JobStatus(job_id=self.j_id,
+                                  job_status=self.test_job_status,
+                                  submission_time=self.test_submission_time)
+        status.save()
         self.assertIs(status.job_status, self.test_job_status)
         self.assertIs(status.submission_time, self.test_submission_time)
 
@@ -269,19 +273,10 @@ class ModelsTest(TestCase):
         Tests whether job_name is properly sanitized - dashed replaced with
         underscores
         """
-        submissiondata = self.j_id.submissiondata_set.create(job_name=self.test_job_name,
-                                                             notify_email=self.test_notify_email,
-                                                             max_ambig=self.test_max_ambig,
-                                                             max_homop=self.test_max_homop,
-                                                             min_length=self.test_min_length,
-                                                             max_length=self.test_max_length,
-                                                             min_overlap=self.test_min_overlap,
-                                                             screen_criteria=self.test_screen_criteria,
-                                                             chop_length=self.test_chop_length,
-                                                             precluster_diffs=self.test_precluster_diffs,
-                                                             classify_seqs_cutoff=self.test_classify_seqs_cutoff,
-                                                             amplicon_type=self.test_amplicon_type)
-        self.assertIs(submissiondata.job_name, self.test_job_name)
+        submissiondata = models.SubmissionData(job_id=self.j_id,
+                                               **self.submission_data_dict)
+        submissiondata.save()
+        self.assertIs(submissiondata.job_name, self.submission_data_dict["job_name"])
 
 
 class FormsTest(TestCase):
