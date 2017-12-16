@@ -66,7 +66,8 @@ def index(request,
                                "seqs_limit": seqs_limit})
             job = JobID(job_id=job_id)
             job.save()
-            seqs_stats = job.seqsstats_set.create(seqs_count=seqs_count)
+            seqsstats = SeqsStats(job_id=job, seqs_count=seqs_count)
+            seqsstats.save()
             form = OptionsForm()
             return render(request,
                           "mothulity/options.html.jj2",
@@ -101,8 +102,10 @@ def submit(request,
         if form.is_valid():
             form_data = form.cleaned_data
             job = get_object_or_404(JobID, job_id=job)
-            job.submissiondata_set.create(**form_data)
-            job.jobstatus_set.create(job_status="pending")
+            submissiondata = SubmissionData(job_id=job, **form_data)
+            submissiondata.save()
+            jobstatus = JobStatus(job_id=job, job_status="pending")
+            jobstatus.save()
             return render(request,
                           "mothulity/submit.html.jj2",
                           {"notify_email": request.POST["notify_email"],
@@ -118,10 +121,8 @@ def submit(request,
 def status(request,
            job):
     job = get_object_or_404(JobID, job_id=job)
-    submissiondata = job.submissiondata_set.values()[0]
-    jobstatus = job.jobstatus_set.values()[0]
     return render(request,
                   "mothulity/status.html.jj2",
-                  {"submissiondata": submissiondata,
-                   "jobstatus": jobstatus,
+                  {"submissiondata": job.submissiondata,
+                   "jobstatus": job.jobstatus,
                    "max_retry": max_retry})
