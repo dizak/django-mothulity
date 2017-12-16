@@ -15,8 +15,9 @@ class JobID(models.Model):
 
 
 class SeqsStats(models.Model):
-    job_id = models.ForeignKey(JobID,
-                               on_delete=models.CASCADE)
+    job_id = models.OneToOneField(JobID,
+                                  on_delete=models.CASCADE,
+                                  primary_key=True)
     seqs_count = models.IntegerField()
 
     def __int__(self):
@@ -24,8 +25,9 @@ class SeqsStats(models.Model):
 
 
 class SubmissionData(models.Model):
-    job_id = models.ForeignKey(JobID,
-                               on_delete=models.CASCADE)
+    job_id = models.OneToOneField(JobID,
+                                  on_delete=models.CASCADE,
+                                  primary_key=True)
     job_name = models.CharField(max_length=20)
     notify_email = models.CharField(max_length=40)
     max_ambig = models.IntegerField()
@@ -52,8 +54,9 @@ class JobStatus(models.Model):
     added_time: int
         Number of times a job has been submitted.
     """
-    job_id = models.ForeignKey(JobID,
-                               on_delete=models.CASCADE)
+    job_id = models.OneToOneField(JobID,
+                                  on_delete=models.CASCADE,
+                                  primary_key=True)
     job_status = models.CharField(max_length=10)
     slurm_id = models.IntegerField(null=True)
     retry = models.IntegerField(default=0)
