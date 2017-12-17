@@ -11,6 +11,7 @@ from time import sleep
 import django
 from django.conf import settings
 from django.shortcuts import get_object_or_404
+from django.forms.models import model_to_dict
 
 sys.path.append("/home/darek/git_repos/django_site/")
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_site.settings")
@@ -90,13 +91,24 @@ def get_seqs_count(job_id):
     int
         Sequence count.
     """
-    job = get_object_or_404(JobID, job_id=job_id)
-    return job.seqsstats_set.values()[0]["seqs_count"]
+    return JobID.objects.get(job_id=job_id).seqsstats.seqs_count
 
 
 def get_slurm_id(job_id):
-    job = get_object_or_404(JobID, job_id=job_id)
-    return job.jobstatus_set.values()[0]["slurm_id"]
+    """
+    Returns slurm ID retrieved from JobStatus model.
+
+    Parameters
+    -------
+    job_id: str
+        Job ID by which sequece count is returned.
+
+    Returns
+    -------
+    int
+        slurm ID.
+    """
+    return JobID.object.get(job_id=job_id).jobstatus.slurm_id
 
 
 def get_retry(job_id):
@@ -113,8 +125,7 @@ def get_retry(job_id):
     int
         Retry number.
     """
-    job = get_object_or_404(JobID, job_id=job_id)
-    return job.jobstatus_set.values()[0]["retry"]
+    return JobID.object.get(job_id=job_id).jobstatus.retry
 
 
 def queue_submit(job_id,
@@ -141,9 +152,9 @@ def queue_submit(job_id,
         <True> if md5sum of the input files matches on the web-server and
         computing cluster, <False> otherwise.
     """
-    job = get_object_or_404(JobID, job_id=job_id)
-    seqs_count = job.seqsstats_set.values()[0]["seqs_count"]
-    sub_data = job.submissiondata_set.values()[0]
+    job = JobID.object.get(job_id=job_id)
+    seqs_count = job.seqsstats.seqs_count
+    sub_data = model_to_dict(job.submissiondata)
     if seqs_count > 500000:
         sub_data["resources"] = "phi"
         sub_data["processors"] = 32
@@ -188,9 +199,9 @@ def change_status(job_id,
     status_model: django.models.Model, default JobStatus
         Django model to use.
     """
-    job = status_model.objects.filter(job_id=job_id)[0]
-    job.job_status = new_status
-    job.save()
+    job = JobID.objects.get(job_id=job_id)
+    job.jobstatus.job_status = new_status
+    job.jobstatus.ave()
 
 
 def add_slurm_id(job_id,
@@ -208,9 +219,9 @@ def add_slurm_id(job_id,
     status_model: django.models.Model, default JobStatus
         Django model to use.
     """
-    job = status_model.objects.filter(job_id=job_id)[0]
-    job.slurm_id = slurm_id
-    job.save()
+    job = JobID.objects.get(job_id=job_id)
+    job.jobstatus.slurm_id = slurm_id
+    job.jobstatus.save()
 
 
 def add_retry(job_id,
@@ -228,9 +239,9 @@ def add_retry(job_id,
     status_model: django.models.Model, default JobStatus
         Django model to use.
     """
-    job = status_model.objects.filter(job_id=job_id)[0]
-    job.retry = retry
-    job.save()
+    job = JobID.objects.get(job_id=job_id)
+    job.jobstatus.retry = retry
+    job.jobstatus.save()
 
 
 def isrunning(job_id,
