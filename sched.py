@@ -108,7 +108,7 @@ def get_slurm_id(job_id):
     int
         slurm ID.
     """
-    return JobID.object.get(job_id=job_id).jobstatus.slurm_id
+    return JobID.objects.get(job_id=job_id).jobstatus.slurm_id
 
 
 def get_retry(job_id):
@@ -125,7 +125,7 @@ def get_retry(job_id):
     int
         Retry number.
     """
-    return JobID.object.get(job_id=job_id).jobstatus.retry
+    return JobID.objects.get(job_id=job_id).jobstatus.retry
 
 
 def queue_submit(job_id,
@@ -152,7 +152,7 @@ def queue_submit(job_id,
         <True> if md5sum of the input files matches on the web-server and
         computing cluster, <False> otherwise.
     """
-    job = JobID.object.get(job_id=job_id)
+    job = JobID.objects.get(job_id=job_id)
     seqs_count = job.seqsstats.seqs_count
     sub_data = model_to_dict(job.submissiondata)
     if seqs_count > 500000:
@@ -161,7 +161,9 @@ def queue_submit(job_id,
     else:
         sub_data["processors"] = 12
     moth_cmd = utils.render_moth_cmd(moth_files=headnode_dir,
-                                     moth_opts=sub_data)
+                                     moth_opts=sub_data,
+                                     pop_elems=["job_id",
+                                                "amplicon_type"])
     try:
         sp.check_output("scp -r {} headnode:{}".format(upld_dir,
                                                        settings.HEADNODE_PREFIX_URL),
@@ -201,7 +203,7 @@ def change_status(job_id,
     """
     job = JobID.objects.get(job_id=job_id)
     job.jobstatus.job_status = new_status
-    job.jobstatus.ave()
+    job.jobstatus.save()
 
 
 def add_slurm_id(job_id,
@@ -330,15 +332,15 @@ def job():
                 change_status(i)
                 print "JobID {} submitted".format(i)
             else:
-                print "Only {} phi nodes free. {} phi nodes allowed".format(idle_phis,
-                                                                            min_phis_free)
+                print "Only {} phi nodes free. {} phi must stay free".format(idle_phis,
+                                                                             min_phis_free)
         if get_seqs_count(i) < 500000 and idle_ns > min_ns_free:
             if queue_submit(i, upld_dir, headnode_dir) is True:
                 change_status(i)
                 print "JobID {} submitted".format(i)
             else:
-                print "Only {} n nodes free. {} n nodes allowed".format(idle_ns,
-                                                                        min_ns_free)
+                print "Only {} n nodes free. {} n nodes must stay free".format(idle_ns,
+                                                                               min_ns_free)
     for i in get_ids_with_status("submitted"):
         print "\nJobID {} Status: submitted. Retries: {}\n".format(i,
                                                                    get_retry(i))
