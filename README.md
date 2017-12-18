@@ -3,9 +3,8 @@
 Web Interface and database/job scheduler for [mothulity](https://github.com/dizak/mothulity).
 
 The main principle is to:
-1. Present HTML front-end to the user which gather submission data.
-2. Run a separate sched.py script which takes care of reading what was gathered in the database
-and submit it to [SLURM](https://slurm.schedmd.com/) and watch the submitted process.
+1. Present HTML front-end to the user which gathers submission data.
+2. Run a separate sched.py script which takes care of reading what was gathered in the database, submits it to [SLURM](https://slurm.schedmd.com/) and watches the submitted process.
 
 ### Installation
 
