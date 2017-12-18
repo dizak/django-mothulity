@@ -9,11 +9,7 @@ and submit it to [SLURM](https://slurm.schedmd.com/) and watch the submitted pro
 
 ### Installation
 
-1. Create virtual env with:
-
-  ```
-  conda env create --file /path/to/mothulity.yaml
-  ```
+1. Create virtual env with:  ``` conda env create --file /path/to/mothulity.yaml ```
 
 2. Create directory_for_django_project.
 
