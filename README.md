@@ -14,17 +14,23 @@ The main principle is to:
 
 3. Add ```mothulity.apps.MothulityConfig``` to directory_for_django_project/django_project/settings.py.
 
-4. Add ```from django.conf.urls import include``` to directory_for_django_project/django_project/urls.py.
+4. Add  ```MEDIA_URL = os.path.join(BASE_DIR, "mothulity/upload/")``` and ```HEADNODE_PREFIX_URL = "/path/to/files/on/computing_cluster"```.
 
-5. Add ```url(r"^mothulity/", include("mothulity.urls"))``` to directory_for_django_project/django_project/urls.py.
+  - MEDIA_URL is where uploaded files are stored on the web-server.
 
-6. ```git clone https://github.com/dizak/mothulity_django``` to directory_for_django_project/django_project.
+  - HEADNODE_PREFIX_URL is where files are copied to the computing cluster.
 
-7. Run ```python manage.py makemigrations && python manage.py migrate```.
+5. Add ```from django.conf.urls import include``` to directory_for_django_project/django_project/urls.py.
 
-8. Run ```tests python manage.py test mothulity```.
+6. Add ```url(r"^mothulity/", include("mothulity.urls"))``` to directory_for_django_project/django_project/urls.py.
 
-9. Run python manage.py runserver.
+7. ```git clone https://github.com/dizak/mothulity_django``` to directory_for_django_project/django_project.
+
+8. Run ```python manage.py makemigrations && python manage.py migrate```.
+
+9. Run ```tests python manage.py test mothulity```.
+
+10. Run ```python manage.py runserver```.
 
 ### Requirements
 
