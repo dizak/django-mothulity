@@ -4,7 +4,25 @@ from __future__ import unicode_literals
 from django.contrib import admin
 from mothulity.models import *
 
+
+class SeqsStatsAdmin(admin.ModelAdmin):
+    list_display = ("seqs_count",)
+
+
+class SubmissionDataAdmin(admin.ModelAdmin):
+    list_display = ("job_name",
+                    "notify_email")
+
+
+class JobStatusAdmin(admin.ModelAdmin):
+    list_display = ("job_id",
+                    "job_status",
+                    "slurm_id",
+                    "retry",
+                    "submission_time")
+
+
 admin.site.register(JobID)
-admin.site.register(SeqsStats)
-admin.site.register(SubmissionData)
-admin.site.register(JobStatus)
+admin.site.register(SeqsStats, SeqsStatsAdmin)
+admin.site.register(SubmissionData, SubmissionDataAdmin)
+admin.site.register(JobStatus, JobStatusAdmin)
