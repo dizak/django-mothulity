@@ -20,11 +20,13 @@ The main principle is to:
 
   - HEADNODE_PREFIX_URL is where files are copied to the computing cluster.
 
+  **EACH URL MUST HAVE TRAILING SLASH!**
+
 5. Add ```from django.conf.urls import include``` to directory_for_django_project/django_project/urls.py.
 
 6. Add ```url(r"^mothulity/", include("mothulity.urls"))``` to directory_for_django_project/django_project/urls.py.
 
-7. ```git clone https://github.com/dizak/mothulity_django``` to directory_for_django_project/django_project.
+7. ```git clone https://github.com/dizak/mothulity_django``` to directory_for_django_project/django_project and rename it to ```mothulity```
 
 8. Run ```python manage.py makemigrations && python manage.py migrate```.
 
