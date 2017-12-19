@@ -91,51 +91,6 @@ class OptionsForm(forms.Form):
             self._errors["min_length"] = "Minimum length greater than maximum"
             del self.cleaned_data["min_length"]
 
-    def clean_max_ambig(self):
-        if self.cleaned_data["max_ambig"] < 0:
-            self._errors["max_ambig"] = "Pass non-negative values"
-            del self.cleaned_data["max_ambig"]
-
-    def clean_max_homop(self):
-        if self.cleaned_data["max_homop"] < 0:
-            self._errors["max_homop"] = "Pass non-negative values"
-            del self.cleaned_data["max_homop"]
-
-    def clean_min_length(self):
-        if self.cleaned_data["min_length"] < 0:
-            self._errors["min_length"] = "Pass non-negative values"
-            del self.cleaned_data["min_length"]
-
-    def clean_max_length(self):
-        if self.cleaned_data["max_length"] < 0:
-            self._errors["max_length"] = "Pass non-negative values"
-            del self.cleaned_data["max_length"]
-
-    def clean_min_overlap(self):
-        if self.cleaned_data["min_overlap"] < 0:
-            self._errors["min_overlap"] = "Pass non-negative values"
-            del self.cleaned_data["min_overlap"]
-
-    def clean_screen_criteria(self):
-        if self.cleaned_data["screen_criteria"] < 0:
-            self._errors["screen_criteria"] = "Pass non-negative values"
-            del self.cleaned_data["screen_criteria"]
-
-    def clean_chop_length(self):
-        if self.cleaned_data["chop_length"] < 0:
-            self._errors["chop_length"] = "Pass non-negative values"
-            del self.cleaned_data["chop_length"]
-
-    def clean_precluster_diffs(self):
-        if self.cleaned_data["precluster_diffs"] < 0:
-            self._errors["precluster_diffs"] = "Pass non-negative values"
-            del self.cleaned_data["precluster_diffs"]
-
-    def clean_classify_seqs_cutoff(self):
-        if self.cleaned_data["classify_seqs_cutoff"] < 0:
-            self._errors["classify_seqs_cutoff"] = "Pass non-negative values"
-            del self.cleaned_data["classify_seqs_cutoff"]
-
     def clean_job_name(self):
         self.cleaned_data["job_name"] = self.cleaned_data["job_name"].replace("-", "_")
         return self.cleaned_data["job_name"]
