@@ -327,17 +327,19 @@ def job():
         headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(i).replace("-", "_"))
         print "JobID {} files {} - web-server".format(i, upld_dir)
         print "JobID {} files {} - computing cluster".format(i, headnode_dir)
-        if get_seqs_count(i) > 500000 and idle_phis > min_phis_free:
-            if queue_submit(i, upld_dir, headnode_dir) is True:
-                change_status(i)
-                print "JobID {} submitted".format(i)
+        if get_seqs_count(i) > 500000:
+            if idle_phis > min_phis_free:
+                if queue_submit(i, upld_dir, headnode_dir) is True:
+                    change_status(i)
+                    print "JobID {} submitted".format(i)
             else:
                 print "Only {} phi nodes free. {} phi must stay free".format(idle_phis,
                                                                              min_phis_free)
-        if get_seqs_count(i) < 500000 and idle_ns > min_ns_free:
-            if queue_submit(i, upld_dir, headnode_dir) is True:
-                change_status(i)
-                print "JobID {} submitted".format(i)
+        if get_seqs_count(i) < 500000:
+            if idle_ns > min_ns_free:
+                if queue_submit(i, upld_dir, headnode_dir) is True:
+                    change_status(i)
+                    print "JobID {} submitted".format(i)
             else:
                 print "Only {} n nodes free. {} n nodes must stay free".format(idle_ns,
                                                                                min_ns_free)
