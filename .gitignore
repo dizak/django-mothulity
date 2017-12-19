@@ -1,6 +1,7 @@
 # ignore anything in migrations folder
 
 migrations/*
+!migrations/__init__.py
 
 # ignore anything in upload folder
 
