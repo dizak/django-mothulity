@@ -88,8 +88,7 @@ class OptionsForm(forms.Form):
         OptionsForm.cleaned_data.
         """
         if self.cleaned_data["min_length"] >= self.cleaned_data["max_length"]:
-            self._errors["min_length"] = ["min_length > max_length"]
-            self._errors["max_length"] = ["max_length < min_length"]
+            self._errors["min_length"] = "Minimum length greater than maximum"
             del self.cleaned_data["min_length"]
 
     def clean_job_name(self):
