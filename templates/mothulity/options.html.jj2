@@ -3,19 +3,19 @@
   Mothulity Index
 {% endblock %}
 {% block content %}
-{% for field in form %}
-  {% if field.errors %}
-    {{ field.errors }}
-  {% endif %}
-{% endfor %}
   <article class="w3-margin w3-card-8 w3-white">
     <form class="w3-container" action="{% url "mothulity:submit" job %}" method="post">
       <h2>Parameters to run mothulity:</h2>
       {% csrf_token %}
         {% for field in form %}
           <div class="fieldWrapper">
-            {{ field.label_tag }}
-            {{ field }}
+            <div class="formField">
+              {{ field.label_tag }}
+            </div>
+            <div class="formField">
+              {{ field }}
+            </div>
+            <p id="error" class="formField">{{ field.errors}}</p>
           </div>
         {% endfor %}
       <p><button class="w3-button w3-black" type="submit">Submit</button></p>

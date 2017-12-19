@@ -114,8 +114,7 @@ def submit(request,
             return render(request,
                           "mothulity/options.html.jj2",
                           {"form": form,
-                           "job": job,
-                           "error": form.errors})
+                           "job": job})
 
 
 def status(request,
