@@ -96,12 +96,98 @@ class OptionsForm(forms.Form):
             self.add_error("max_length", msg)
 
     def clean_job_name(self):
+        """
+        Replace dashes and whitespaces with underscores in job_name.
+        """
         cleaned_data = self.cleaned_data["job_name"]
-        return cleaned_data.replace("-", "_")
+        return cleaned_data.replace("-", "_").replace(" ", "_")
 
     def clean_max_ambig(self):
+        """
+        Add error if negative values is passed.
+        """
         cleaned_data = self.cleaned_data["max_ambig"]
         if cleaned_data < 0:
             msg = "Pass non-negative values"
             self.add_error("max_ambig", msg)
+        return cleaned_data
+
+    def clean_max_homop(self):
+        """
+        Add error if negative values is passed.
+        """
+        cleaned_data = self.cleaned_data["max_homop"]
+        if cleaned_data < 0:
+            msg = "Pass non-negative values"
+            self.add_error("max_homop", msg)
+        return cleaned_data
+
+    def clean_min_length(self):
+        """
+        Add error if negative values is passed.
+        """
+        cleaned_data = self.cleaned_data["min_length"]
+        if cleaned_data < 0:
+            msg = "Pass non-negative values"
+            self.add_error("min_length", msg)
+        return cleaned_data
+
+    def clean_max_length(self):
+        """
+        Add error if negative values is passed.
+        """
+        cleaned_data = self.cleaned_data["max_length"]
+        if cleaned_data < 0:
+            msg = "Pass non-negative values"
+            self.add_error("max_length", msg)
+        return cleaned_data
+
+    def clean_min_overlap(self):
+        """
+        Add error if negative values is passed.
+        """
+        cleaned_data = self.cleaned_data["min_overlap"]
+        if cleaned_data < 0:
+            msg = "Pass non-negative values"
+            self.add_error("min_overlap", msg)
+        return cleaned_data
+
+    def clean_screen_criteria(self):
+        """
+        Add error if negative values is passed.
+        """
+        cleaned_data = self.cleaned_data["screen_criteria"]
+        if cleaned_data < 0:
+            msg = "Pass non-negative values"
+            self.add_error("screen_criteria", msg)
+        return cleaned_data
+
+    def clean_chop_length(self):
+        """
+        Add error if negative values is passed.
+        """
+        cleaned_data = self.cleaned_data["chop_length"]
+        if cleaned_data < 0:
+            msg = "Pass non-negative values"
+            self.add_error("chop_length", msg)
+        return cleaned_data
+
+    def clean_precluster_diffs(self):
+        """
+        Add error if negative values is passed.
+        """
+        cleaned_data = self.cleaned_data["precluster_diffs"]
+        if cleaned_data < 0:
+            msg = "Pass non-negative values"
+            self.add_error("precluster_diffs", msg)
+        return cleaned_data
+
+    def clean_classify_seqs_cutoff(self):
+        """
+        Add error if negative values is passed.
+        """
+        cleaned_data = self.cleaned_data["classify_seqs_cutoff"]
+        if cleaned_data < 0:
+            msg = "Pass non-negative values"
+            self.add_error("classify_seqs_cutoff", msg)
         return cleaned_data
