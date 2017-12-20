@@ -96,5 +96,5 @@ class OptionsForm(forms.Form):
             self.add_error("max_length", msg)
 
     def clean_job_name(self):
-        self.cleaned_data["job_name"] = self.cleaned_data["job_name"].replace("-", "_")
-        return self.cleaned_data["job_name"]
+        cleaned_data = self.cleaned_data["job_name"]
+        return cleaned_data.replace("-", "_")
