@@ -98,3 +98,10 @@ class OptionsForm(forms.Form):
     def clean_job_name(self):
         cleaned_data = self.cleaned_data["job_name"]
         return cleaned_data.replace("-", "_")
+
+    def clean_max_ambig(self):
+        cleaned_data = self.cleaned_data["max_ambig"]
+        if cleaned_data < 0:
+            msg = "Pass non-negative values"
+            self.add_error("max_ambig", msg)
+        return cleaned_data
