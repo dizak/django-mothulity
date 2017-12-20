@@ -11,7 +11,8 @@ class SeqsStatsAdmin(admin.ModelAdmin):
 
 class SubmissionDataAdmin(admin.ModelAdmin):
     list_display = ("job_name",
-                    "notify_email")
+                    "notify_email",
+                    "amplicon_type")
 
 
 class JobStatusAdmin(admin.ModelAdmin):
