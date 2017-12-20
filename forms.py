@@ -41,16 +41,16 @@ class OptionsForm(forms.Form):
                                                     "class": input_class}))
     min_length = forms.IntegerField(label="Minimum length of read allowed.",
                                     widget=forms.
-                                    TextInput(attrs={"value": 400,
+                                    TextInput(attrs={"value": 100,
                                                      "class": input_class}))
     max_length = forms.IntegerField(label="Maximum length of read allowed.",
                                     widget=forms.
-                                    TextInput(attrs={"value": 500,
+                                    TextInput(attrs={"value": 300,
                                                      "class": input_class}))
     min_overlap = forms.IntegerField(label="Minimum number of bases overlap in\
                                      contig",
                                      widget=forms.
-                                     TextInput(attrs={"value": 25,
+                                     TextInput(attrs={"value": 10,
                                                       "class": input_class}))
     screen_criteria = forms.IntegerField(label="Trim start and end of the read\
                                          will be selected to fit these values\
@@ -59,9 +59,10 @@ class OptionsForm(forms.Form):
                                          TextInput(attrs={"value": 95,
                                                           "class": input_class}))
     chop_length = forms.IntegerField(label=" Cut all the reads to this length.\
-                                     Keeps front of the sequences",
+                                     Keeps front of the sequences. Applies to\
+                                     ITS only!",
                                      widget=forms.
-                                     TextInput(attrs={"value": 250,
+                                     TextInput(attrs={"value": 120,
                                                       "class": input_class}))
     precluster_diffs = forms.IntegerField(label="Number of differences between\
                                           reads treated as insignificant.",
