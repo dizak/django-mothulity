@@ -190,4 +190,7 @@ class OptionsForm(forms.Form):
         if cleaned_data < 0:
             msg = "Pass non-negative values"
             self.add_error("classify_seqs_cutoff", msg)
+        elif cleaned_data > 100:
+            msg = "Pass below 100 value"
+            self.add_error("classify_seqs_cutoff", msg)
         return cleaned_data
