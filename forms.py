@@ -87,9 +87,13 @@ class OptionsForm(forms.Form):
         information to OptionsForm._errors and deletes value from
         OptionsForm.cleaned_data.
         """
-        if self.cleaned_data["min_length"] >= self.cleaned_data["max_length"]:
-            self._errors["min_length"] = "Minimum length greater than maximum"
-            del self.cleaned_data["min_length"]
+        cleaned_data = super(OptionsForm, self).clean()
+        min_length = cleaned_data.get("min_length")
+        max_length = cleaned_data.get("max_length")
+        if min_length >= max_length:
+            msg = "Minimum length cannot be greater or qual to minimum length"
+            self.add_error("min_length", msg)
+            self.add_error("max_length", msg)
 
     def clean_job_name(self):
         self.cleaned_data["job_name"] = self.cleaned_data["job_name"].replace("-", "_")

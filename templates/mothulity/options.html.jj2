@@ -15,7 +15,9 @@
             <div class="formField">
               {{ field }}
             </div>
-            <p id="error" class="formField">{{ field.errors}}</p>
+            <div id="error" class="formField">
+              {{ field.errors}}
+            </div>
           </div>
         {% endfor %}
       <p><button class="w3-button w3-black" type="submit">Submit</button></p>
