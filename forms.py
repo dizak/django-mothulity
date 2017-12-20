@@ -97,10 +97,10 @@ class OptionsForm(forms.Form):
 
     def clean_job_name(self):
         """
-        Replace dashes and whitespaces with underscores in job_name.
+        Replace non-alphanumeric chars with underscores in job_name.
         """
         cleaned_data = self.cleaned_data["job_name"]
-        return cleaned_data.replace("-", "_").replace(" ", "_")
+        return "".join([i if i.isalnum() else "_" for i in cleaned_data])
 
     def clean_max_ambig(self):
         """
