@@ -34,7 +34,20 @@
     <section>
       <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form }}
+        {% for field in form %}
+          <div class="fieldWrapper">
+            <div class="formField">
+              {{ field.label_tag }}
+            </div>
+            <div class="formField">
+              {{ field }}
+            </div>
+            <div id="error" class="formField">
+              {{ field.errors}}
+            </div>
+          </div>
+        {% endfor %}
+        <br>
         <button class="w3-button w3-black" type="submit" onclick=showDiv('UploadSpinner')>Submit</button>
       </form>
       <div class="loader" id="UploadSpinner" style="display:none"></div>
