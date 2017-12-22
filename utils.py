@@ -3,6 +3,7 @@ from glob import glob
 import subprocess as sp
 from skbio.io import sniff
 import Bio.SeqIO as sio
+import math
 
 
 class ParserError(Exception):
@@ -48,6 +49,29 @@ def chmod_file(input_file,
     sp.check_output("chmod {} {}".format(mod,
                                          input_file),
                     shell=True)
+
+
+def convert_size(size_bytes):
+    """
+    Returns human-readable file size from input in bytes.
+
+    Parameters
+    -------
+    size_bytes: int
+        File size in bytes
+
+    Returns
+    -------
+    int
+        Size in human-readable format.
+    """
+    if size_bytes == 0:
+        return "0B"
+    size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+    i = int(math.floor(math.log(size_bytes, 1024)))
+    p = math.pow(1024, i)
+    s = round(size_bytes / p, 2)
+    return "{}{}".format(s, size_name[i])
 
 
 def md5sum(input_file,
