@@ -1,4 +1,5 @@
 from django import forms
+import utils
 
 input_class = "w3-input"
 
@@ -12,10 +13,13 @@ class FileFieldForm(forms.Form):
                                                                         "autocomplete": "off"}))
 
     def clean_file_field(self):
-        max_size = 2621440
+        max_size = 104857600
         cleaned_data = self.cleaned_data["file_field"]
         if cleaned_data._size > max_size:
-            msg = "One of the files exceeds maximum size allowed ({})".format(cleaned_data._size)
+            size_hr = utils.convert_size(cleaned_data._size)
+            max_size_hr = utils.convert_size(max_size)
+            msg = "File too big ({}). Maximumum size allowed: {}".format(size_hr,
+                                                                         max_size_hr)
             self.add_error("file_field", msg)
         return cleaned_data
 
