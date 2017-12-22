@@ -55,15 +55,6 @@ def index(request,
                                   {"form": form,
                                    "upload_error": True})
             seqs_count = utils.count_seqs("{}*fastq".format(upld_dir))
-            if seqs_count > seqs_limit:
-                sp.check_output("rm -r {}".format(upld_dir), shell=True)
-                form = FileFieldForm()
-                return render(request,
-                              "mothulity/index.html.jj2",
-                              {"form": form,
-                               "too_many_error": True,
-                               "seqs_count": seqs_count,
-                               "seqs_limit": seqs_limit})
             job = JobID(job_id=job_id)
             job.save()
             seqsstats = SeqsStats(job_id=job, seqs_count=seqs_count)
