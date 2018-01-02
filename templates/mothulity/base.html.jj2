@@ -20,6 +20,9 @@
       #error {
         color: red;
       }
+      .introSlides img {
+        margin-left: 20%;
+      }
 
     @keyframes spin {
       0% { transform: rotate(0deg); }
