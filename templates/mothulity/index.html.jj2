@@ -13,16 +13,6 @@
     </section>
   </article>
 {% else %}
-{% if too_many_error %}
-  <article class="w3-container w3-margin w3-card-8 w3-red">
-    <h2>Too many sequences...</h2>
-    <section>
-      <p>Sorry, it seems your project is way to big for our computing facility...</p>
-      <p>We allow for no more than {{ seqs_limit }}, you uploaded {{ seqs_count }}</p>
-      <p>Your can try dividing it into bins uploaded separately if it is scientifically congruent.</p>
-      <p>If not, you might be in need for bioinformatician's help.</p>
-    </section>
-  </article>
 {% endif %}
   <article class="w3-container w3-margin w3-card-8 w3-white">
     <h1>Hello from mothulity index!</h1>
