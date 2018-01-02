@@ -41,7 +41,6 @@
     <nav>
       <ul class="w3-navbar w3-ul w3-xlarge w3-margin w3-card-8 w3-padding-16 w3-black">
         <li class="w3-green w3-button w3-hover-black"><a href="{% url "mothulity:index" %}">HOME</a></li>
-        <li class="w3-green w3-button w3-hover-black"><a href="https://mothur.org">mothur</a></li>
       </ul>
     </nav>
     <section class="w3-container w3-grey">
