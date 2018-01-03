@@ -27,6 +27,7 @@
       }
       nav li {
         margin-bottom: 10px;
+        display: block;
       }
       #mobileNavigation {
         display: none;
@@ -90,7 +91,7 @@
     </header>
     <nav id="desktopNavigation">
       <ul class="w3-sidebar w3-bar-block">
-        <li class="w3-bar-item w3-button"><img style="width: 80%; margin: auto" src="{% static "mothulity/logo.png" %}" alt="mothulity"><a href="{% url "mothulity:index" %}">mothulity home</a></li>
+        <li class="w3-bar-item w3-button"><a href="{% url "mothulity:index" %}"><img style="width: 80%; margin: auto" src="{% static "mothulity/logo.png" %}" alt="mothulity">mothulity home</a></li>
         <li class="w3-bar-item w3-button w3-green w3-hover-black"><a href="https://en.wikipedia.org/wiki/Alpha_diversity">what is alpha-biodiversity?</a></li>
         <li class="w3-bar-item w3-button w3-green w3-hover-black"><a href="https://en.wikipedia.org/wiki/Beta_diversity">what is beta-biodiversity?</a></li>
       </ul>
