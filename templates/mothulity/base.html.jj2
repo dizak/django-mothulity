@@ -3,8 +3,34 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <!-- Browser Bar Coloration for Chrome, Firefox OS and Opera -->
+    <meta name="theme-color" content="#4caf50">
+    <!-- Browser Bar Coloration for Windows Phone -->
+    <meta name="msapplication-navbutton-color" content="#4caf50">
+    <!-- Browser Bar Coloration for iOS Safari -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="#4caf50">
+    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1,user-scalable=0">
     <link rel="stylesheet" type="text/css" href={% static "mothulity/style.css" %}>
     <style media="screen">
+      header div {
+          display: inline-block;
+      }
+      #hamburger {
+        font-size: 1.2em;
+      }
+      #mothulityName {
+        font-size: 1.2em;
+      }
+      #headerLogo {
+        width: 60px;
+        float: right;
+      }
+      nav li {
+        margin-bottom: 10px;
+      }
+      #mobileNavigation {
+        display: none;
+      }
       .loader {
         border: 16px solid #f3f3f3; /* Light grey */
         border-top: 16px solid #4caf50; /* W3 green */
@@ -23,11 +49,26 @@
       .introSlides img {
         margin-left: 20%;
       }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      @media screen and (min-width: 900px) {
+        #headerBar {
+          display: none;
+        }
+        section {
+          margin-left: 25%;
+        }
+        #desktopNavigation {
+          width: 25%;
+        }
+      }
+      @media screen and (max-width: 900px) {
+        #desktopNavigation {
+          display: none;
+        }
+      }
     input[type=file]:invalid ~ button[type=submit] {
       display: none;
     }
@@ -38,15 +79,43 @@
     <title>{% block title %}{% endblock %}</title>
   </head>
   <body>
-    <nav>
-      <ul class="w3-navbar w3-ul w3-xlarge w3-margin w3-card-8 w3-padding-16 w3-black">
-        <li class="w3-green w3-button w3-hover-black"><a href="{% url "mothulity:index" %}">HOME</a></li>
+    <header id="headerBar" class="w3-container w3-xlarge w3-margin w3-card-8 w3-padding-16 w3-green">
+      <button id="hamburger" class="w3-button w3-xlarge" type="button" name="button" onclick="mobileNavigationOpen('mobileNavigation')">
+        ☰
+      </button>
+      <div id=mothulityName>
+        mothulity
+      </div>
+      <img id="headerLogo" src="{% static "mothulity/logo.png" %}" alt="mothulity">
+    </header>
+    <nav id="desktopNavigation">
+      <ul class="w3-sidebar w3-bar-block">
+        <li class="w3-bar-item w3-button"><img style="width: 80%; margin: auto" src="{% static "mothulity/logo.png" %}" alt="mothulity"><a href="{% url "mothulity:index" %}">mothulity home</a></li>
+        <li class="w3-bar-item w3-button w3-green w3-hover-black"><a href="https://en.wikipedia.org/wiki/Alpha_diversity">what is alpha-biodiversity?</a></li>
+        <li class="w3-bar-item w3-button w3-green w3-hover-black"><a href="https://en.wikipedia.org/wiki/Beta_diversity">what is beta-biodiversity?</a></li>
+      </ul>
+    </nav>
+    <nav id="mobileNavigation">
+      <ul class="w3-sidebar w3-bar-block">
+        <button onclick="mobileNavigationClose('mobileNavigation')" class="w3-bar-item w3-button w3-large">Close &times;</button>
+        <li class="w3-bar-item w3-button"><a href="{% url "mothulity:index" %}">mothulity home</a></li>
+        <li class="w3-bar-item w3-button w3-green w3-hover-black"><a href="https://en.wikipedia.org/wiki/Alpha_diversity">what is alpha-biodiversity?</a></li>
+        <li class="w3-bar-item w3-button w3-green w3-hover-black"><a href="https://en.wikipedia.org/wiki/Beta_diversity">what is beta-biodiversity?</a></li>
       </ul>
     </nav>
     <section class="w3-container w3-grey">
       {% block content %}{% endblock %}
       {% block footer %}Some copyright{% endblock %}
     </section>
+    <script>
+      function mobileNavigationOpen(elID) {
+          document.getElementById(elID).style.width = "100%";
+          document.getElementById(elID).style.display = "block";
+      }
+      function mobileNavigationClose(elID) {
+          document.getElementById(elID).style.display = "none";
+      }
+      </script>
     <script type="text/javascript">
       function showDiv(elId) {
         document.getElementById(elId).style.display = 'block';
