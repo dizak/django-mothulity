@@ -71,9 +71,6 @@
         {% for field in form %}
           <div class="fieldWrapper">
             <div class="formField">
-              {{ field.label_tag }}
-            </div>
-            <div class="formField">
               {{ field }}
             </div>
             <div id="error" class="formField">
