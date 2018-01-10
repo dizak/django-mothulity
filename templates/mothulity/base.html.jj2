@@ -101,7 +101,7 @@
         <li class="w3-bar-item w3-button w3-green w3-hover-black"><a href="https://en.wikipedia.org/wiki/Beta_diversity">what is beta-biodiversity?</a></li>
       </ul>
     </nav>
-    <nav id="mobileNavigation" class="w3-sidebar w3-bar-block">
+    <nav id="mobileNavigation" class="w3-sidebar w3-top w3-bar-block">
         <button onclick="mobileNavigationClose('mobileNavigation')" class="w3-bar-item w3-button w3-large">Close &times;</button>
         <a class="w3-bar-item w3-button" href="{% url "mothulity:index" %}">mothulity home</a>
         <a class="w3-bar-item w3-button" href="https://en.wikipedia.org/wiki/Alpha_diversity">what is alpha-biodiversity?</a>
