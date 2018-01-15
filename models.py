@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from django.db import models
+from froala_editor.fields import FroalaField
 from django.utils import timezone
 import pytz
 
@@ -65,3 +66,11 @@ class JobStatus(models.Model):
 
     def __str__(self):
         return self.job_status
+
+
+class Article(models.Model):
+    """
+    Model for small wiki articles.
+    """
+    title = models.CharField(max_length=100)
+    content = FroalaField()

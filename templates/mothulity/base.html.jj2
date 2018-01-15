@@ -97,15 +97,17 @@
     <nav id="desktopNavigation">
       <ul class="w3-sidebar w3-bar-block">
         <li class="w3-bar-item w3-button"><a href="{% url "mothulity:index" %}"><img style="width: 80%; margin: auto" src="{% static "mothulity/logo.png" %}" alt="mothulity">mothulity home</a></li>
-        <li class="w3-bar-item w3-button w3-green w3-hover-black"><a href="https://en.wikipedia.org/wiki/Alpha_diversity">what is alpha-biodiversity?</a></li>
-        <li class="w3-bar-item w3-button w3-green w3-hover-black"><a href="https://en.wikipedia.org/wiki/Beta_diversity">what is beta-biodiversity?</a></li>
+        {% for art in articles %}
+          <li class="w3-bar-item w3-button w3-green w3-hover-black"><a href="#">{{ art.title }}</a></li>
+        {% endfor %}
       </ul>
     </nav>
     <nav id="mobileNavigation" class="w3-sidebar w3-top w3-bar-block">
         <button onclick="mobileNavigationClose('mobileNavigation')" class="w3-bar-item w3-button w3-large">Close &times;</button>
         <a class="w3-bar-item w3-button" href="{% url "mothulity:index" %}">mothulity home</a>
-        <a class="w3-bar-item w3-button" href="https://en.wikipedia.org/wiki/Alpha_diversity">what is alpha-biodiversity?</a>
-        <a class="w3-bar-item w3-button" href="https://en.wikipedia.org/wiki/Beta_diversity">what is beta-biodiversity?</a>
+        {% for art in articles %}
+          <li class="w3-bar-item w3-button w3-green w3-hover-black"><a href="#">{{ art.title }}</a></li>
+        {% endfor %}
     </nav>
     <section class="w3-container w3-grey">
       {% block content %}{% endblock %}

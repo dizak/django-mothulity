@@ -52,7 +52,8 @@ def index(request,
                     form = FileFieldForm()
                     return render(request,
                                   "mothulity/index.html.jj2",
-                                  {"form": form,
+                                  {"articles": Article.objects.all(),
+                                   "form": form,
                                    "upload_error": True})
             seqs_count = utils.count_seqs("{}*fastq".format(upld_dir))
             job = JobID(job_id=job_id)
@@ -62,13 +63,15 @@ def index(request,
             form = OptionsForm()
             return render(request,
                           "mothulity/options.html.jj2",
-                          {"form": form,
+                          {"articles": Article.objects.all(),
+                           "form": form,
                            "job": job_id})
     else:
         form = FileFieldForm()
     return render(request,
                   "mothulity/index.html.jj2",
-                  {"form": form})
+                  {"articles": Article.objects.all(),
+                   "form": form})
 
 
 def submit(request,
@@ -99,12 +102,14 @@ def submit(request,
             jobstatus.save()
             return render(request,
                           "mothulity/submit.html.jj2",
-                          {"notify_email": request.POST["notify_email"],
+                          {"articles": Article.objects.all(),
+                           "notify_email": request.POST["notify_email"],
                            "job_id": job.job_id})
         else:
             return render(request,
                           "mothulity/options.html.jj2",
-                          {"form": form,
+                          {"articles": Article.objects.all(),
+                           "form": form,
                            "job": job})
 
 
@@ -113,6 +118,7 @@ def status(request,
     job = get_object_or_404(JobID, job_id=job)
     return render(request,
                   "mothulity/status.html.jj2",
-                  {"submissiondata": job.submissiondata,
+                  {"articles": Article.objects.all(),
+                   "submissiondata": job.submissiondata,
                    "jobstatus": job.jobstatus,
                    "max_retry": max_retry})
