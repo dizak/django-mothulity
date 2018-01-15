@@ -1,0 +1,15 @@
+{% extends "mothulity/base.html.jj2" %}
+{% load static %}
+{% block title %}
+  Mothulity Wiki
+{% endblock %}
+{% block content %}
+  {% for art in articles %}
+    {% if art.title == title %}
+    <article class="w3-container w3-margin w3-card-8 w3-white">
+      <h1>{{ art.title|safe }}</h1>
+      {{ art.content|safe }}
+    </article>
+    {% endif %}
+  {% endfor %}
+{% endblock %}
