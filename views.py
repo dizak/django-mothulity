@@ -122,3 +122,15 @@ def status(request,
                    "submissiondata": job.submissiondata,
                    "jobstatus": job.jobstatus,
                    "max_retry": max_retry})
+
+
+def wiki(request,
+         title):
+    """
+    Displays small wiki articles created with models.Article.
+    """
+    title = request.path.split("/")[-1]
+    return render(request,
+                  "mothulity/wiki.html.jj2",
+                  {"title": title,
+                   "articles": Article.objects.all()})
