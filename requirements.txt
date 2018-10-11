@@ -1,0 +1,6 @@
+django<=2.1.2
+django-froala-editor
+biopython
+numpy
+pandas
+scikit-bio
