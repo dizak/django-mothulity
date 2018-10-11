@@ -1,12 +1,23 @@
 from setuptools import find_packages
 from distutils.core import setup
-from glob import glob
+from mothulity import __version__ as VERSION
+from mothulity import __author__ as AUTHOR
 
 
 setup(
     name='django-mothulity',
-    version='v0.0.0',
-    author='Dariusz Izak, IBB PAS',
+    version=VERSION,
+    author=AUTHOR,
     packages=find_packages(exclude=['*test*']),
-    include_package_data=True
+    include_package_data=True,
+    install_requires=open('requirements.txt').readlines(),
+    description='Web fron-end for mothulity',
+    long_description=open('README.md').read(),
+    long_description_content_type='text/markdown',
+    author_email='dariusz.izak@ibb.waw.pl',
+    url='https://github.com/dizak/django-mothulity',
+    classifiers=[
+        "Operating System :: POSIX :: Linux",
+        "Programming Language :: Python :: 3",
+    ]
 )
