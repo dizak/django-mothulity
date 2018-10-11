@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#! /usr/bin/env python
 
 
 import os
@@ -13,19 +13,18 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.forms.models import model_to_dict
 
-sys.path.append("/home/dizak/Software/django_site/")
+sys.path.append(os.path.abspath(sys.argv[1]))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_site.settings")
 django.setup()
 
 from mothulity.models import *
 from mothulity import utils
 
-
-min_ns_free = 20
-min_phis_free = 5
-max_retry = 1
-files_to_copy = ["*shared",
-                 "*cons.tax.summary"]
+min_ns_free = settings.MIN_NS_FREE
+min_phis_free = settings.MIN_PHIS_FREE
+max_retry = settings.MAX_RETRY
+files_to_copy = settings.FILES_TO_COPY
+INTERVAL = settings.INTERVAL
 
 
 def get_pending_ids(ids_quantity=20,
@@ -377,7 +376,7 @@ def job():
         change_status(i, "closed")
 
 
-schedule.every(5).seconds.do(job)
+schedule.every(INTERVAL).seconds.do(job)
 
 
 def main():
