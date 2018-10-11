@@ -48,7 +48,7 @@ def chmod_file(input_file,
     """
     sp.check_output("chmod {} {}".format(mod,
                                          input_file),
-                    shell=True)
+                    shell=True).decode('utf-8')
 
 
 def convert_size(size_bytes):

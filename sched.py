@@ -167,7 +167,7 @@ def queue_submit(job_id,
     try:
         sp.check_output("scp -r {} headnode:{}".format(upld_dir,
                                                        settings.HEADNODE_PREFIX_URL),
-                        shell=True)
+                        shell=True).decode('utf-8')
     except Exception as e:
         print("Could not copy to computing cluster")
         return False

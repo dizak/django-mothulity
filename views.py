@@ -37,7 +37,7 @@ def index(request,
             job_id = uuid.uuid4()
             upld_dir = "{}{}/".format(settings.MEDIA_URL,
                                       str(job_id).replace("-", "_"))
-            sp.check_output("mkdir {}".format(upld_dir), shell=True)
+            sp.check_output("mkdir {}".format(upld_dir), shell=True).decode('utf-8')
             upld_files = request.FILES.getlist("file_field")
             for upfile in upld_files:
                 utils.write_file(upfile,
@@ -48,7 +48,7 @@ def index(request,
                 if utils.sniff_file("{}{}".format(upld_dir,
                                                   upfile),
                                     "fastq") is not True:
-                    sp.check_output("rm -r {}".format(upld_dir), shell=True)
+                    sp.check_output("rm -r {}".format(upld_dir), shell=True).decode('utf-8')
                     form = FileFieldForm()
                     return render(request,
                                   "mothulity/index.html.jj2",
