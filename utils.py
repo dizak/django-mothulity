@@ -96,10 +96,10 @@ def md5sum(input_file,
     if remote is True:
         md5_output = sp.check_output("ssh {} md5sum {}".format(machine,
                                                                input_file),
-                                     shell=True).split()[::2]
+                                     shell=True).decode('utf-8').split()[::2]
     else:
         md5_output = sp.check_output("md5sum {}".format(input_file),
-                                     shell=True).split()[::2]
+                                     shell=True).decode('utf-8').split()[::2]
     if len(md5_output) > 1:
         return md5_output
     else:
@@ -195,7 +195,7 @@ def ssh_cmd(cmd,
         Command output if cmd is fruitful function.
     """
     cmd = "ssh {} {}".format(machine, cmd)
-    return sp.check_output(cmd, shell=True).strip()
+    return sp.check_output(cmd, shell=True).decode('utf-8').strip()
 
 
 def sniff_file(input_file,
