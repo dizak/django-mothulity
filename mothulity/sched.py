@@ -20,12 +20,10 @@ django.setup()
 from mothulity.models import *
 from mothulity import utils
 
-
-min_ns_free = 20
-min_phis_free = 5
-max_retry = 1
-files_to_copy = ["*shared",
-                 "*cons.tax.summary"]
+min_ns_free = settings.MIN_NS_FREE
+min_phis_free = settings.MIN_PHIS_FREE
+max_retry = settings.MAX_RETRY
+files_to_copy = settings.FILES_TO_COPY
 
 
 def get_pending_ids(ids_quantity=20,
