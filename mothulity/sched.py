@@ -13,7 +13,7 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.forms.models import model_to_dict
 
-sys.path.append("/home/dizak/Software/django_site/")
+sys.path.append(os.path.abspath(sys.argv[1]))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_site.settings")
 django.setup()
 
