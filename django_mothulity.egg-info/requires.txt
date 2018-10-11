@@ -1,7 +1,0 @@
-django<=2.1.2
-django-froala-editor
-schedule
-biopython
-numpy
-pandas
-scikit-bio
