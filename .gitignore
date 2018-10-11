@@ -1,13 +1,13 @@
 # ignore anything in migrations folder but __init__.py
 
-migrations/*
-!migrations/__init__.py
+mothulity/migrations/*
+!mothulity/migrations/__init__.py
 
 # ignore anything in upload folder but .keepit
 
-upload/*
-!upload/.keepit
+mothulity/upload/*
+!mothulity/upload/.keepit
 
 # ignore pyc files
 
-*pyc
+mothulity/*pyc
