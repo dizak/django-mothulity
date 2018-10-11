@@ -48,7 +48,7 @@ def chmod_file(input_file,
     """
     sp.check_output("chmod {} {}".format(mod,
                                          input_file),
-                    shell=True)
+                    shell=True).decode('utf-8')
 
 
 def convert_size(size_bytes):
@@ -96,10 +96,10 @@ def md5sum(input_file,
     if remote is True:
         md5_output = sp.check_output("ssh {} md5sum {}".format(machine,
                                                                input_file),
-                                     shell=True).split()[::2]
+                                     shell=True).decode('utf-8').split()[::2]
     else:
         md5_output = sp.check_output("md5sum {}".format(input_file),
-                                     shell=True).split()[::2]
+                                     shell=True).decode('utf-8').split()[::2]
     if len(md5_output) > 1:
         return md5_output
     else:
@@ -195,7 +195,7 @@ def ssh_cmd(cmd,
         Command output if cmd is fruitful function.
     """
     cmd = "ssh {} {}".format(machine, cmd)
-    return sp.check_output(cmd, shell=True).strip()
+    return sp.check_output(cmd, shell=True).decode('utf-8').strip()
 
 
 def sniff_file(input_file,
@@ -280,7 +280,7 @@ def render_moth_cmd(moth_exec="mothulity",
     moth_opts["run"] = shell
     moth_opts["output-dir"] = moth_files
     moth_opt_str = " ".join(["--{} {}".format(k.replace("_", "-"), v)
-                             for k, v in moth_opts.items()])
+                             for k, v in list(moth_opts.items())])
     return "{} {} {}".format(moth_exec,
                              moth_files,
                              moth_opt_str)
