@@ -15,7 +15,7 @@ class FileFieldForm(forms.Form):
     def clean_file_field(self):
         max_size = 104857600
         cleaned_data = self.cleaned_data["file_field"]
-        if cleaned_data._size > max_size:
+        if cleaned_data.size > max_size:
             size_hr = utils.convert_size(cleaned_data._size)
             max_size_hr = utils.convert_size(max_size)
             msg = "File too big ({}). Maximumum size allowed: {}".format(size_hr,
