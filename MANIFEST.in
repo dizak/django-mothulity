@@ -1,0 +1,3 @@
+include README.md
+recursive-include mothulity/static *
+recursive-include mothulity/templates *
