@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
+
 import os
 import sys
 import schedule
@@ -169,15 +169,15 @@ def queue_submit(job_id,
                                                        settings.HEADNODE_PREFIX_URL),
                         shell=True)
     except Exception as e:
-        print "Could not copy to computing cluster"
+        print("Could not copy to computing cluster")
         return False
     upld_md5 = utils.md5sum("{}*".format(upld_dir))
     headnode_md5 = utils.md5sum("{}*".format(headnode_dir), remote=True)
-    print upld_md5
-    print headnode_md5
+    print(upld_md5)
+    print(headnode_md5)
     if sorted(upld_md5) == sorted(headnode_md5):
         sbatch_out = utils.ssh_cmd(moth_cmd)
-        print sbatch_out
+        print(sbatch_out)
         if sbatch_success in sbatch_out:
             add_slurm_id(job_id=job_id,
                          slurm_id=int(sbatch_out.split(" ")[-1]))
@@ -320,51 +320,51 @@ def job():
     Retrieve pending jobs and submit them properly to the computing cluster.
     """
     for i in get_pending_ids():
-        print "\nJobID {} Status: pending\n".format(i)
+        print("\nJobID {} Status: pending\n".format(i))
         idle_ns = utils.parse_sinfo(utils.ssh_cmd("sinfo"), "long", "idle")
         idle_phis = utils.parse_sinfo(utils.ssh_cmd("sinfo"), "accel", "idle")
         upld_dir = "{}{}/".format(settings.MEDIA_URL, str(i).replace("-", "_"))
         headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(i).replace("-", "_"))
-        print "JobID {} files {} - web-server".format(i, upld_dir)
-        print "JobID {} files {} - computing cluster".format(i, headnode_dir)
+        print("JobID {} files {} - web-server".format(i, upld_dir))
+        print("JobID {} files {} - computing cluster".format(i, headnode_dir))
         if get_seqs_count(i) > 500000:
             if idle_phis > min_phis_free:
                 if queue_submit(i, upld_dir, headnode_dir) is True:
                     change_status(i)
-                    print "JobID {} submitted".format(i)
+                    print("JobID {} submitted".format(i))
             else:
-                print "Only {} phi nodes free. {} phi must stay free".format(idle_phis,
-                                                                             min_phis_free)
+                print("Only {} phi nodes free. {} phi must stay free".format(idle_phis,
+                                                                             min_phis_free))
         if get_seqs_count(i) < 500000:
             if idle_ns > min_ns_free:
                 if queue_submit(i, upld_dir, headnode_dir) is True:
                     change_status(i)
-                    print "JobID {} submitted".format(i)
+                    print("JobID {} submitted".format(i))
             else:
-                print "Only {} n nodes free. {} n nodes must stay free".format(idle_ns,
-                                                                               min_ns_free)
+                print("Only {} n nodes free. {} n nodes must stay free".format(idle_ns,
+                                                                               min_ns_free))
     for i in get_ids_with_status("submitted"):
-        print "\nJobID {} Status: submitted. Retries: {}\n".format(i,
-                                                                   get_retry(i))
+        print("\nJobID {} Status: submitted. Retries: {}\n".format(i,
+                                                                   get_retry(i)))
         upld_dir = "{}{}/".format(settings.MEDIA_URL, str(i).replace("-", "_"))
         headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(i).replace("-", "_"))
         if isrunning(i) is False and isdone(headnode_dir, filename="*shared") is False and get_retry(i) >= max_retry:
-            print "JobID above retry limit. Changing its status to <dead>"
+            print("JobID above retry limit. Changing its status to <dead>")
             change_status(i, "dead")
             break
         if isrunning(i) is False and isdone(headnode_dir, filename="*shared") is False and get_retry(i) < max_retry:
-            print "JobID {} is NOT done and is NOT runnning. Will be resubmitted".format(i)
+            print("JobID {} is NOT done and is NOT runnning. Will be resubmitted".format(i))
             utils.ssh_cmd("mv {} {}trash/".format(headnode_dir,
                                                   settings.HEADNODE_PREFIX_URL))
             change_status(i, "pending")
             add_retry(i, get_retry(i) + 1)
             break
         if isrunning(i) is False and isdone(headnode_dir, filename="*shared") is True:
-            print "JobID {} is done".format(i)
+            print("JobID {} is done".format(i))
             change_status(i, "done")
             break
     for i in get_ids_with_status("done"):
-        print "\nJobID {} Status: done. Trying to copy.\n".format(i)
+        print("\nJobID {} Status: done. Trying to copy.\n".format(i))
         upld_dir = "{}{}/".format(settings.MEDIA_URL, str(i).replace("-", "_"))
         headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(i).replace("-", "_"))
         for ii in files_to_copy:
@@ -373,7 +373,7 @@ def job():
                                  upld_dir=upld_dir,
                                  headnode_dir=headnode_dir)
             except Exception as e:
-                print "File not found"
+                print("File not found")
         change_status(i, "closed")
 
 

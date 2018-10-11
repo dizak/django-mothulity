@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from mothulity.forms import FileFieldForm, OptionsForm
 from mothulity.models import *
 from mothulity.sched import max_retry, isdone
-import utils
+from . import utils
 import uuid
 import subprocess as sp
 

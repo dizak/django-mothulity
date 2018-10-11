@@ -1,5 +1,5 @@
 from django import forms
-import utils
+from . import utils
 
 input_class = "w3-input"
 
