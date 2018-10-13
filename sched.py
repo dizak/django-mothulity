@@ -14,7 +14,12 @@ from django.shortcuts import get_object_or_404
 from django.forms.models import model_to_dict
 
 sys.path.append(os.path.abspath(sys.argv[1]))
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_site.settings")
+os.environ.setdefault(
+    "DJANGO_SETTINGS_MODULE",
+    "{}.settings".format(
+        [i for i in os.path.abspath(sys.argv[1]).split('/') if len(i) > 0][-1]
+        ),
+    )
 django.setup()
 
 from mothulity.models import *
