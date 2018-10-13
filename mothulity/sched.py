@@ -154,9 +154,8 @@ def queue_submit(job_id,
     job_id_dir = '{}{}/'.format(headnode_prefix, str(job_id).replace('-', '_'))
     if seqs_count > 500000:
         sub_data["resources"] = "phi"
-        sub_data["processors"] = 32
     else:
-        sub_data["processors"] = 12
+        sub_data["resources"] = "n"
     moth_cmd = utils.render_moth_cmd(moth_files=job_id_dir,
                                      moth_opts=sub_data,
                                      pop_elems=["job_id",
