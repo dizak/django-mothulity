@@ -52,7 +52,7 @@ INTERVAL = 5
 
   - This starts the development HTTP server.
 
-1. Run ```python ./mothulity/sched.py <path_to_project>```
+1. Run ```python sched.py <name_of_project>```
 
   - This starts the scheduler.
 
