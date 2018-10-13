@@ -188,15 +188,21 @@ def remove_except(directory,
     files = glob('{}*'.format(directory))
     files_to_remove = [i for i in files if extension not in i]
     if safety:
-        return sp.check_output(
-            'ls {}'.format(' '.join(files_to_remove)),
-            shell=True,
-            ).decode('utf-8')
+        try:
+            return sp.check_output(
+                'ls {}'.format(' '.join(files_to_remove)),
+                shell=True,
+                ).decode('utf-8')
+        except Exception as e:
+            return False
     else:
-        return sp.check_output(
-            'rm {}'.format(' '.join(files_to_remove)),
-            shell=True,
-            ).decode('utf-8')
+        try:
+            return sp.check_output(
+                'rm {}'.format(' '.join(files_to_remove)),
+                shell=True,
+                ).decode('utf-8')
+        except Exception as e:
+            return False
 
 
 def change_status(job_id,
@@ -365,26 +371,20 @@ def job():
             break
         if isrunning(i) is False and isdone(job_sshfs_dir) is False and get_retry(i) < max_retry:
             print("JobID {} is NOT done and is NOT runnning. Will be resubmitted".format(i))
-            utils.ssh_cmd("mv {} {}trash/".format(headnode_dir,
-                                                  settings.HEADNODE_PREFIX_URL))
+            remove_except(job_sshfs_dir, 'fastq', safety=False)
             change_status(i, "pending")
             add_retry(i, get_retry(i) + 1)
             break
-        if isrunning(i) is False and isdone(headnode_dir, filename="*shared") is True:
+        if isrunning(i) is False and isdone(job_sshfs_dir, filename="*shared") is True:
             print("JobID {} is done".format(i))
             change_status(i, "done")
             break
     for i in get_ids_with_status("done"):
-        print("\nJobID {} Status: done. Trying to copy.\n".format(i))
-        upld_dir = "{}{}/".format(settings.MEDIA_URL, str(i).replace("-", "_"))
-        for ii in files_to_copy:
-            try:
-                get_from_cluster(filename=ii,
-                                 upld_dir=upld_dir,
-                                 headnode_dir=headnode_dir)
-            except Exception as e:
-                print("File not found")
-        change_status(i, "closed")
+        print("\nJobID {} Status: done.\n".format(i))
+        job_sshfs_dir = "{}{}/".format(media_url, str(i).replace("-", "_"))
+        if isdone(job_sshfs_dir, filename='*zip):
+            remove_except(job_sshfs_dir, '*zip', safety=False)
+            change_status(i, 'closed')
 
 
 schedule.every(interval).seconds.do(job)
