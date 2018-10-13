@@ -24,7 +24,9 @@ min_ns_free = settings.MIN_NS_FREE
 min_phis_free = settings.MIN_PHIS_FREE
 max_retry = settings.MAX_RETRY
 files_to_copy = settings.FILES_TO_COPY
-INTERVAL = settings.INTERVAL
+interval = settings.INTERVAL
+headnode_prefix = settings.HEADNODE_PREFIX_URL
+media_url = settings.MEDIA_URL
 
 
 def get_pending_ids(ids_quantity=20,
@@ -128,8 +130,7 @@ def get_retry(job_id):
 
 
 def queue_submit(job_id,
-                 upld_dir,
-                 headnode_dir,
+                 headnode_prefix,
                  sbatch_success="Submitted batch job"):
     """
     Retrieves required data from models by Job ID, renders mothulity command,
@@ -140,10 +141,6 @@ def queue_submit(job_id,
     -------
     job_id: str
         Job ID by which rest of data are retrieved.
-    upld_dir: str
-        Path to input files on the web-service server.
-    headnode_dir: str
-        Path to input files on the computing cluster.
 
     Returns
     -------
@@ -154,35 +151,57 @@ def queue_submit(job_id,
     job = JobID.objects.get(job_id=job_id)
     seqs_count = job.seqsstats.seqs_count
     sub_data = model_to_dict(job.submissiondata)
+    job_id_dir = '{}{}/'.format(headnode_prefix, str(job_id).replace('-', '_'))
     if seqs_count > 500000:
         sub_data["resources"] = "phi"
-        sub_data["processors"] = 32
     else:
-        sub_data["processors"] = 12
-    moth_cmd = utils.render_moth_cmd(moth_files=headnode_dir,
+        sub_data["resources"] = "n"
+    moth_cmd = utils.render_moth_cmd(moth_files=job_id_dir,
                                      moth_opts=sub_data,
                                      pop_elems=["job_id",
                                                 "amplicon_type"])
-    try:
-        sp.check_output("scp -r {} headnode:{}".format(upld_dir,
-                                                       settings.HEADNODE_PREFIX_URL),
-                        shell=True).decode('utf-8')
-    except Exception as e:
-        print("Could not copy to computing cluster")
-        return False
-    upld_md5 = utils.md5sum("{}*".format(upld_dir))
-    headnode_md5 = utils.md5sum("{}*".format(headnode_dir), remote=True)
-    print(upld_md5)
-    print(headnode_md5)
-    if sorted(upld_md5) == sorted(headnode_md5):
-        sbatch_out = utils.ssh_cmd(moth_cmd)
-        print(sbatch_out)
-        if sbatch_success in sbatch_out:
-            add_slurm_id(job_id=job_id,
-                         slurm_id=int(sbatch_out.split(" ")[-1]))
-            return True
+    sbatch_out = utils.ssh_cmd(moth_cmd)
+    if sbatch_success in sbatch_out:
+        add_slurm_id(job_id=job_id,
+                     slurm_id=int(sbatch_out.split(" ")[-1]))
+        return True
     else:
         return False
+
+
+def remove_except(directory,
+                  extension,
+                  safety=True):
+    """
+    Remove non-recursively everything from the directory except extension.
+
+    Parameters
+    -------
+    directory: str
+        Directory path from which the unwanted files will be removed.
+    extension: str
+        Files ending with this will NOT be removed from the directory.
+    """
+    if not directory.endswith('/'):
+        directory = directory + '/'
+    files = glob('{}*'.format(directory))
+    files_to_remove = [i for i in files if extension not in i]
+    if safety:
+        try:
+            return sp.check_output(
+                'ls {}'.format(' '.join(files_to_remove)),
+                shell=True,
+                ).decode('utf-8')
+        except Exception as e:
+            return False
+    else:
+        try:
+            return sp.check_output(
+                'rm {}'.format(' '.join(files_to_remove)),
+                shell=True,
+                ).decode('utf-8')
+        except Exception as e:
+            return False
 
 
 def change_status(job_id,
@@ -269,7 +288,7 @@ def isrunning(job_id,
         return False
 
 
-def isdone(headnode_dir,
+def isdone(directory,
            filename="analysis*zip"):
     """
     Check for the zipped analysis on the computing cluster and copy it back if
@@ -277,7 +296,7 @@ def isdone(headnode_dir,
 
     Parameters
     -------
-    headnode_dir: str
+    upld_dir: str
         Path to files on the computing cluster.
 
     Returns
@@ -286,7 +305,10 @@ def isdone(headnode_dir,
         True if file exists or False if it does not.
     """
     try:
-        utils.ssh_cmd("ls {}{}".format(headnode_dir, filename))
+        sp.check_output(
+            "ls {}{}".format(directory, filename),
+            check_output=True
+            ).decode('utf-8')
         return True
     except Exception as e:
         return False
@@ -322,13 +344,9 @@ def job():
         print("\nJobID {} Status: pending\n".format(i))
         idle_ns = utils.parse_sinfo(utils.ssh_cmd("sinfo"), "long", "idle")
         idle_phis = utils.parse_sinfo(utils.ssh_cmd("sinfo"), "accel", "idle")
-        upld_dir = "{}{}/".format(settings.MEDIA_URL, str(i).replace("-", "_"))
-        headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(i).replace("-", "_"))
-        print("JobID {} files {} - web-server".format(i, upld_dir))
-        print("JobID {} files {} - computing cluster".format(i, headnode_dir))
         if get_seqs_count(i) > 500000:
             if idle_phis > min_phis_free:
-                if queue_submit(i, upld_dir, headnode_dir) is True:
+                if queue_submit(i, headnode_prefix) is True:
                     change_status(i)
                     print("JobID {} submitted".format(i))
             else:
@@ -336,7 +354,7 @@ def job():
                                                                              min_phis_free))
         if get_seqs_count(i) < 500000:
             if idle_ns > min_ns_free:
-                if queue_submit(i, upld_dir, headnode_dir) is True:
+                if queue_submit(i, headnode_prefix) is True:
                     change_status(i)
                     print("JobID {} submitted".format(i))
             else:
@@ -345,38 +363,30 @@ def job():
     for i in get_ids_with_status("submitted"):
         print("\nJobID {} Status: submitted. Retries: {}\n".format(i,
                                                                    get_retry(i)))
-        upld_dir = "{}{}/".format(settings.MEDIA_URL, str(i).replace("-", "_"))
-        headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(i).replace("-", "_"))
-        if isrunning(i) is False and isdone(headnode_dir, filename="*shared") is False and get_retry(i) >= max_retry:
+        job_sshfs_dir = "{}{}/".format(media_url, str(i).replace("-", "_"))
+        if isrunning(i) is False and isdone(job_sshfs_dir) is False and get_retry(i) >= max_retry:
             print("JobID above retry limit. Changing its status to <dead>")
             change_status(i, "dead")
             break
-        if isrunning(i) is False and isdone(headnode_dir, filename="*shared") is False and get_retry(i) < max_retry:
+        if isrunning(i) is False and isdone(job_sshfs_dir) is False and get_retry(i) < max_retry:
             print("JobID {} is NOT done and is NOT runnning. Will be resubmitted".format(i))
-            utils.ssh_cmd("mv {} {}trash/".format(headnode_dir,
-                                                  settings.HEADNODE_PREFIX_URL))
+            remove_except(job_sshfs_dir, 'fastq', safety=False)
             change_status(i, "pending")
             add_retry(i, get_retry(i) + 1)
             break
-        if isrunning(i) is False and isdone(headnode_dir, filename="*shared") is True:
+        if isrunning(i) is False and isdone(job_sshfs_dir, filename="*shared") is True:
             print("JobID {} is done".format(i))
             change_status(i, "done")
             break
     for i in get_ids_with_status("done"):
-        print("\nJobID {} Status: done. Trying to copy.\n".format(i))
-        upld_dir = "{}{}/".format(settings.MEDIA_URL, str(i).replace("-", "_"))
-        headnode_dir = "{}{}/".format(settings.HEADNODE_PREFIX_URL, str(i).replace("-", "_"))
-        for ii in files_to_copy:
-            try:
-                get_from_cluster(filename=ii,
-                                 upld_dir=upld_dir,
-                                 headnode_dir=headnode_dir)
-            except Exception as e:
-                print("File not found")
-        change_status(i, "closed")
+        print("\nJobID {} Status: done.\n".format(i))
+        job_sshfs_dir = "{}{}/".format(media_url, str(i).replace("-", "_"))
+        if isdone(job_sshfs_dir, filename='*zip'):
+            remove_except(job_sshfs_dir, '*zip', safety=False)
+            change_status(i, 'closed')
 
 
-schedule.every(INTERVAL).seconds.do(job)
+schedule.every(interval).seconds.do(job)
 
 
 def main():
