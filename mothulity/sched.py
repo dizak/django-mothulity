@@ -170,6 +170,35 @@ def queue_submit(job_id,
         return False
 
 
+def remove_except(directory,
+                  extension,
+                  safety=True):
+    """
+    Remove non-recursively everything from the directory except extension.
+
+    Parameters
+    -------
+    directory: str
+        Directory path from which the unwanted files will be removed.
+    extension: str
+        Files ending with this will NOT be removed from the directory.
+    """
+    if not directory.endswith('/'):
+        directory = directory + '/'
+    files = glob('{}*'.format(directory))
+    files_to_remove = [i for i in files if extension not in i]
+    if safety:
+        return sp.check_output(
+            'ls {}'.format(' '.join(files_to_remove)),
+            shell=True,
+            ).decode('utf-8')
+    else:
+        return sp.check_output(
+            'rm {}'.format(' '.join(files_to_remove)),
+            shell=True,
+            ).decode('utf-8')
+
+
 def change_status(job_id,
                   new_status="submitted",
                   status_model=JobStatus):
