@@ -382,7 +382,7 @@ def job():
     for i in get_ids_with_status("done"):
         print("\nJobID {} Status: done.\n".format(i))
         job_sshfs_dir = "{}{}/".format(media_url, str(i).replace("-", "_"))
-        if isdone(job_sshfs_dir, filename='*zip):
+        if isdone(job_sshfs_dir, filename='*zip'):
             remove_except(job_sshfs_dir, '*zip', safety=False)
             change_status(i, 'closed')
 
