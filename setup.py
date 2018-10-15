@@ -11,7 +11,7 @@ setup(
     packages=find_packages(exclude=['*test*']),
     include_package_data=True,
     install_requires=open('requirements.txt').readlines(),
-    scripts=['mothulity/sched.py'],
+    scripts=['sched.py'],
     description='Web fron-end for mothulity',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
