@@ -8,7 +8,7 @@ import pytz
 from io import BytesIO
 import os
 import uuid
-from mothulity import views, models, forms, utils, sched
+from mothulity import views, models, forms, utils
 
 
 class UtilsTests(TestCase):
