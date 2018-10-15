@@ -1,4 +1,3 @@
-from setuptools import find_packages
 from distutils.core import setup
 from mothulity import __version__ as VERSION
 from mothulity import __author__ as AUTHOR
@@ -8,7 +7,7 @@ setup(
     name='django-mothulity',
     version=VERSION,
     author=AUTHOR,
-    packages=find_packages(exclude=['*test*']),
+    packages=['mothulity'],
     include_package_data=True,
     install_requires=open('requirements.txt').readlines(),
     scripts=['sched.py'],
