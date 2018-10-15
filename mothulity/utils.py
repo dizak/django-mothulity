@@ -414,10 +414,12 @@ def queue_submit(job_id,
     seqs_count = job.seqsstats.seqs_count
     sub_data = model_to_dict(job.submissiondata)
     job_id_dir = '{}{}/'.format(headnode_prefix, str(job_id).replace('-', '_'))
-    if seqs_count > 500000:
-        sub_data["resources"] = "phi"
-    else:
-        sub_data["resources"] = "n"
+    # if seqs_count > 500000:
+    #     sub_data["resources"] = "phi"
+    # else:
+    #     sub_data["resources"] = "n"
+    sub_data["resources"] = "phi"
+    print('Every job goes with resources=PHI. This is a temporary patch as there an unidentified problem with regular nodes.')
     moth_cmd = render_moth_cmd(moth_files=job_id_dir,
                                      moth_opts=sub_data,
                                      pop_elems=["job_id",
