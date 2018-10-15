@@ -5,7 +5,7 @@ from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from mothulity.forms import FileFieldForm, OptionsForm
 from mothulity.models import *
-from mothulity.sched import max_retry, isdone
+from mothulity.utils import isdone
 from . import utils
 import uuid
 import subprocess as sp
@@ -121,7 +121,7 @@ def status(request,
                   {"articles": Article.objects.all(),
                    "submissiondata": job.submissiondata,
                    "jobstatus": job.jobstatus,
-                   "max_retry": max_retry})
+                   "max_retry": settings.MAX_RETRY})
 
 
 def wiki(request,
