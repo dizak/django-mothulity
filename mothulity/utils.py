@@ -4,6 +4,11 @@ import subprocess as sp
 from skbio.io import sniff
 import Bio.SeqIO as sio
 import math
+import django
+from django.conf import settings
+from django.shortcuts import get_object_or_404
+from django.forms.models import model_to_dict
+from mothulity import models
 
 
 class ParserError(Exception):
@@ -284,3 +289,310 @@ def render_moth_cmd(moth_exec="mothulity",
     return "{} {} {}".format(moth_exec,
                              moth_files,
                              moth_opt_str)
+
+
+def get_pending_ids(ids_quantity=20,
+                    status="pending",
+                    status_model=models.JobStatus):
+    """
+    Returns Job IDs of oldest pending jobs within given limit retrieved from
+    JobStatus model.
+
+    Parameters
+    -------
+    ids_quantity: int, default <20>
+        Maximium number of Job IDs to return.
+    status: str, default <pending>
+        Status of job in JobStatus model.
+    status_model: django.models.Model, default JobStatus
+        Django model to use.
+
+    Returns
+    -------
+    list of str
+        job_id with <pending> status.
+    """
+    ids = [i.job_id for i in status_model.objects.filter(job_status=status).
+           order_by("-submission_time")]
+    if len(ids) < ids_quantity:
+        return ids
+    else:
+        return ids[:ids_quantity]
+
+
+def get_ids_with_status(status="submitted",
+                        status_model=models.JobStatus):
+    """
+    Returns Job IDs of jobs with given status.
+
+    Parameters
+    -------
+    status: str, default <submitted>
+        Status of job in JobStatus model.
+    status_model: django.models.Model, default JobStatus
+        Django model to use.
+
+    Returns
+    -------
+    list of str
+        job_id with <submitted> status.
+    """
+    return [i.job_id for i in status_model.objects.filter(job_status=status)]
+
+
+def get_seqs_count(job_id):
+    """
+    Returns total sequence count retrieved from SeqsStats model.
+
+    Parameters
+    -------
+    job_id: str
+        Job ID by which sequece count is returned.
+
+    Returns
+    -------
+    int
+        Sequence count.
+    """
+    return models.JobID.objects.get(job_id=job_id).seqsstats.seqs_count
+
+
+def get_slurm_id(job_id):
+    """
+    Returns slurm ID retrieved from JobStatus model.
+
+    Parameters
+    -------
+    job_id: str
+        Job ID by which sequece count is returned.
+
+    Returns
+    -------
+    int
+        slurm ID.
+    """
+    return models.JobID.objects.get(job_id=job_id).jobstatus.slurm_id
+
+
+def get_retry(job_id):
+    """
+    Returns number of retry from JobStatus model.
+
+    Parameters
+    -------
+    job_id: str
+        Job ID by which sequece count is returned.
+
+    Returns
+    -------
+    int
+        Retry number.
+    """
+    return models.JobID.objects.get(job_id=job_id).jobstatus.retry
+
+
+def queue_submit(job_id,
+                 headnode_prefix,
+                 sbatch_success="Submitted batch job"):
+    """
+    Retrieves required data from models by Job ID, renders mothulity command,
+    copies files to computing cluster and sends the mothulity command. Adds
+    JobStatus.slurm_id after slurm.
+
+    Parameters
+    -------
+    job_id: str
+        Job ID by which rest of data are retrieved.
+
+    Returns
+    -------
+    bool
+        <True> if md5sum of the input files matches on the web-server and
+        computing cluster, <False> otherwise.
+    """
+    job = models.JobID.objects.get(job_id=job_id)
+    seqs_count = job.seqsstats.seqs_count
+    sub_data = model_to_dict(job.submissiondata)
+    job_id_dir = '{}{}/'.format(headnode_prefix, str(job_id).replace('-', '_'))
+    if seqs_count > 500000:
+        sub_data["resources"] = "phi"
+    else:
+        sub_data["resources"] = "n"
+    moth_cmd = render_moth_cmd(moth_files=job_id_dir,
+                                     moth_opts=sub_data,
+                                     pop_elems=["job_id",
+                                                "amplicon_type"])
+    sbatch_out = ssh_cmd(moth_cmd)
+    if sbatch_success in sbatch_out:
+        add_slurm_id(job_id=job_id,
+                     slurm_id=int(sbatch_out.split(" ")[-1]))
+        return True
+    else:
+        return False
+
+
+def remove_except(directory,
+                  extension,
+                  safety=True):
+    """
+    Remove non-recursively everything from the directory except extension.
+
+    Parameters
+    -------
+    directory: str
+        Directory path from which the unwanted files will be removed.
+    extension: str
+        Files ending with this will NOT be removed from the directory.
+    """
+    if not directory.endswith('/'):
+        directory = directory + '/'
+    files = glob('{}*'.format(directory))
+    files_to_remove = [i for i in files if extension not in i]
+    if safety:
+        try:
+            return sp.check_output(
+                'ls {}'.format(' '.join(files_to_remove)),
+                shell=True,
+                ).decode('utf-8')
+        except Exception as e:
+            return False
+    else:
+        try:
+            return sp.check_output(
+                'rm {}'.format(' '.join(files_to_remove)),
+                shell=True,
+                ).decode('utf-8')
+        except Exception as e:
+            return False
+
+
+def change_status(job_id,
+                  new_status="submitted",
+                  status_model=models.JobStatus):
+    """
+    Changes status from pending to submitted in the JobStatus model.
+
+    Parameters
+    -------
+    job_id: str
+        Job ID of job which status should be changed.
+    new_status: str
+        Content of new status.
+    status_model: django.models.Model, default JobStatus
+        Django model to use.
+    """
+    job = models.JobID.objects.get(job_id=job_id)
+    job.jobstatus.job_status = new_status
+    job.jobstatus.save()
+
+
+def add_slurm_id(job_id,
+                 slurm_id,
+                 status_model=models.JobStatus):
+    """
+    Adds submission ID to the existing set in the JobStatus model.
+
+    Parameters
+    -------
+    job_id: str
+        Job ID of job which status should be changed.
+    slurm_id: int
+        Submission ID.
+    status_model: django.models.Model, default JobStatus
+        Django model to use.
+    """
+    job = models.JobID.objects.get(job_id=job_id)
+    job.jobstatus.slurm_id = slurm_id
+    job.jobstatus.save()
+
+
+def add_retry(job_id,
+              retry,
+              status_model=models.JobStatus):
+    """
+    Adds retry existing set in the JobStatus model.
+
+    Parameters
+    -------
+    job_id: str
+        Job ID of job which status should be changed.
+    retry: int
+        Retry number.
+    status_model: django.models.Model, default JobStatus
+        Django model to use.
+    """
+    job = models.JobID.objects.get(job_id=job_id)
+    job.jobstatus.retry = retry
+    job.jobstatus.save()
+
+
+def isrunning(job_id,
+              status_model=models.JobStatus):
+    """
+    Check if job is actually running on the computing cluster.
+
+    Parameters
+    ------
+    job_id: str
+        Job ID of job which status should be changed.
+    status_model: django.models.Model, default JobStatus
+        Django model to use.
+
+    Returns
+    -------
+    bool
+        True is submitted ID has <R> state in squeue output.
+    """
+    slurm_id = get_slurm_id(job_id)
+    if parse_squeue(ssh_cmd("squeue"), slurm_id, "ST") == "R":
+        return True
+    else:
+        return False
+
+
+def isdone(directory,
+           filename="analysis*zip"):
+    """
+    Check for the zipped analysis on the computing cluster and copy it back if
+    it exists or return False otherwise.
+
+    Parameters
+    -------
+    upld_dir: str
+        Path to files on the computing cluster.
+
+    Returns
+    -------
+    bool
+        True if file exists or False if it does not.
+    """
+    try:
+        sp.check_output(
+            "ls {}{}".format(directory, filename),
+            check_output=True
+            ).decode('utf-8')
+        return True
+    except Exception as e:
+        return False
+
+
+def get_from_cluster(filename,
+                     upld_dir,
+                     headnode_dir):
+    """
+    Copy zipped analysis file from the computing cluster back to the
+    web-server and check md5sum afterwards.
+
+    Parameters
+    -------
+    filename: str
+        Name of file to copy. Glob is accepted.
+    upld_dir: str
+        Path to files on the web-service server.
+    headnode_dir: str
+        Path to files on the computing cluster.
+    """
+    sp.call("scp headnode:{}{} {}".format(headnode_dir,
+                                          filename,
+                                          upld_dir),
+            shell=True)
