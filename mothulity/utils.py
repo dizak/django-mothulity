@@ -571,7 +571,7 @@ def isdone(directory,
     try:
         sp.check_output(
             "ls {}{}".format(directory, filename),
-            check_output=True
+            shell=True
             ).decode('utf-8')
         return True
     except Exception as e:
