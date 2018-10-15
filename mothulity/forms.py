@@ -51,14 +51,14 @@ class OptionsForm(forms.Form):
                                    widget=forms.
                                    TextInput(attrs={"value": 8,
                                                     "class": input_class}))
-    min_length = forms.IntegerField(label="Minimum length of read allowed.",
-                                    widget=forms.
-                                    TextInput(attrs={"value": 100,
-                                                     "class": input_class}))
-    max_length = forms.IntegerField(label="Maximum length of read allowed.",
-                                    widget=forms.
-                                    TextInput(attrs={"value": 300,
-                                                     "class": input_class}))
+    # min_length = forms.IntegerField(label="Minimum length of read allowed.",
+    #                                 widget=forms.
+    #                                 TextInput(attrs={"value": 100,
+    #                                                  "class": input_class}))
+    # max_length = forms.IntegerField(label="Maximum length of read allowed.",
+    #                                 widget=forms.
+    #                                 TextInput(attrs={"value": 300,
+    #                                                  "class": input_class}))
     min_overlap = forms.IntegerField(label="Minimum number of bases overlap in\
                                      contig",
                                      widget=forms.
@@ -94,19 +94,19 @@ class OptionsForm(forms.Form):
                                       widget=forms.
                                       RadioSelect())
 
-    def clean(self):
-        """
-        Validates if min_length is not greater than max_length. Passes proper
-        information to OptionsForm._errors and deletes value from
-        OptionsForm.cleaned_data.
-        """
-        cleaned_data = super(OptionsForm, self).clean()
-        min_length = cleaned_data.get("min_length")
-        max_length = cleaned_data.get("max_length")
-        if min_length >= max_length:
-            msg = "Minimum length cannot be greater or qual to minimum length"
-            self.add_error("min_length", msg)
-            self.add_error("max_length", msg)
+    # def clean(self):
+    #     """
+    #     Validates if min_length is not greater than max_length. Passes proper
+    #     information to OptionsForm._errors and deletes value from
+    #     OptionsForm.cleaned_data.
+    #     """
+    #     cleaned_data = super(OptionsForm, self).clean()
+    #     min_length = cleaned_data.get("min_length")
+    #     max_length = cleaned_data.get("max_length")
+    #     if min_length >= max_length:
+    #         msg = "Minimum length cannot be greater or qual to minimum length"
+    #         self.add_error("min_length", msg)
+    #         self.add_error("max_length", msg)
 
     def clean_job_name(self):
         """
@@ -135,25 +135,25 @@ class OptionsForm(forms.Form):
             self.add_error("max_homop", msg)
         return cleaned_data
 
-    def clean_min_length(self):
-        """
-        Add error if negative values is passed.
-        """
-        cleaned_data = self.cleaned_data["min_length"]
-        if cleaned_data < 0:
-            msg = "Pass non-negative values"
-            self.add_error("min_length", msg)
-        return cleaned_data
-
-    def clean_max_length(self):
-        """
-        Add error if negative values is passed.
-        """
-        cleaned_data = self.cleaned_data["max_length"]
-        if cleaned_data < 0:
-            msg = "Pass non-negative values"
-            self.add_error("max_length", msg)
-        return cleaned_data
+    # def clean_min_length(self):
+    #     """
+    #     Add error if negative values is passed.
+    #     """
+    #     cleaned_data = self.cleaned_data["min_length"]
+    #     if cleaned_data < 0:
+    #         msg = "Pass non-negative values"
+    #         self.add_error("min_length", msg)
+    #     return cleaned_data
+    #
+    # def clean_max_length(self):
+    #     """
+    #     Add error if negative values is passed.
+    #     """
+    #     cleaned_data = self.cleaned_data["max_length"]
+    #     if cleaned_data < 0:
+    #         msg = "Pass non-negative values"
+    #         self.add_error("max_length", msg)
+    #     return cleaned_data
 
     def clean_min_overlap(self):
         """
