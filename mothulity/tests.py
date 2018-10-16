@@ -67,7 +67,7 @@ class UtilsTests(TestCase):
         self.test_job_dir = 'mothulity/tests/{}/'.format(self.test_job_id)
         os.system('mkdir {}'.format(self.test_job_dir))
         os.system('touch {0}1.fastq {0}2.fastq {0}mothur.job.sh {0}analysis_mothur.job.zip'.format(self.test_job_dir))
-        self.ref_remove_except = ['analysis_mothur.job.zip']
+        self.ref_files_to_remove = sorted('{0}1.fastq {0}2.fastq {0}mothur.job.sh'.format(self.test_job_dir).split(' '))
 
     def tearDown(self):
         """
@@ -197,7 +197,12 @@ class UtilsTests(TestCase):
         """
         Tests whether only unwanted files are being removed.
         """
-        pass
+        print(self.ref_files_to_remove)
+        print(utils.remove_except(self.test_job_dir, '*zip'))
+        self.assertEqual(
+            utils.remove_except(self.test_job_dir, '*zip'),
+            self.ref_files_to_remove
+        )
 
 
 class ViewsResponseTests(TestCase):
