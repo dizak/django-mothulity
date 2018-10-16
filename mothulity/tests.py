@@ -38,7 +38,6 @@ class UtilsTests(TestCase):
                                          fastq_file)
         self.summ_file = "{}/{}".format(settings.BASE_DIR,
                                         summ_file)
-        self.mock_md5sum = "7e4f54362bd0f030a623a6aaba27ddba"
         self.machine = "headnode"
         self.cmd = "uname"
         self.cmd_out = "Linux"
@@ -93,23 +92,6 @@ class UtilsTests(TestCase):
         """
         self.assertEqual(utils.count_seqs(self.fastq_file), 4779)
 
-    def test_md5sum(self):
-        """
-        Tests whether utils.md5sum returns correct hash when run on file\
-        locally.
-        """
-        self.assertEqual(utils.md5sum(self.fastq_file),
-                         self.mock_md5sum)
-
-    # def test_md5sum_remote(self):
-    #     """
-    #     Tests whether utils.md5sum returns correct hash when run on file\
-    #     rmeotely.
-    #     """
-    #     self.assertEqual(utils.md5sum(self.fastq_file_remote,
-    #                                   remote=True,
-    #                                   machine=self.remote_machine),
-    #                      self.mock_md5sum)
 
     def test_parse_sinfo(self):
         """
