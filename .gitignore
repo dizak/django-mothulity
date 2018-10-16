@@ -11,3 +11,12 @@ mothulity/upload/*
 # ignore pyc files
 
 mothulity/*pyc
+
+# ignore everything in __pycache__
+
+mothulity/__pycache__/*
+
+# ignore django-specific files
+
+db*
+manage.py
