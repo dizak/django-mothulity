@@ -80,38 +80,6 @@ def convert_size(size_bytes):
     return "{}{}".format(s, size_name[i])
 
 
-def md5sum(input_file,
-           remote=False,
-           machine="headnode"):
-    """
-    Generates md5sum of a file usign linux system command.
-
-    Parameters
-    -------
-    input_file: str
-        Path to input file.
-    remote: bool, default <False>
-        When <True>, uses ssh to check md5sum on remote machine.
-    machine: str
-        Name of the machine to call md5sum on when remote set to <True>.
-    Returns
-    -------
-    str
-        md5sum.
-    """
-    if remote is True:
-        md5_output = sp.check_output("ssh {} md5sum {}".format(machine,
-                                                               input_file),
-                                     shell=True).decode('utf-8').split()[::2]
-    else:
-        md5_output = sp.check_output("md5sum {}".format(input_file),
-                                     shell=True).decode('utf-8').split()[::2]
-    if len(md5_output) > 1:
-        return md5_output
-    else:
-        return md5_output[0]
-
-
 def parse_sinfo(input_str,
                 partition,
                 state):
@@ -408,8 +376,7 @@ def queue_submit(job_id,
     Returns
     -------
     bool
-        <True> if md5sum of the input files matches on the web-server and
-        computing cluster, <False> otherwise.
+        <True> if SLURM status equals <R>.
     """
     job = models.JobID.objects.get(job_id=job_id)
     seqs_count = job.seqsstats.seqs_count
@@ -569,25 +536,3 @@ def isdone(directory,
         return True
     except Exception as e:
         return False
-
-
-def get_from_cluster(filename,
-                     upld_dir,
-                     headnode_dir):
-    """
-    Copy zipped analysis file from the computing cluster back to the
-    web-server and check md5sum afterwards.
-
-    Parameters
-    -------
-    filename: str
-        Name of file to copy. Glob is accepted.
-    upld_dir: str
-        Path to files on the web-service server.
-    headnode_dir: str
-        Path to files on the computing cluster.
-    """
-    sp.call("scp headnode:{}{} {}".format(headnode_dir,
-                                          filename,
-                                          upld_dir),
-            shell=True)

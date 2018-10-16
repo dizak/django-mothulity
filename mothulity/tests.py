@@ -30,6 +30,7 @@ class UtilsTests(TestCase):
         long_idle_nodes: int, <61>
             Number of nodes idle in queue long.
         """
+        self.test_job_id = str(uuid.uuid4())
         fastq_file = "mothulity/tests/Mock_S280_L001_R1_001.fastq"
         summ_file = "mothulity/tests/mothur.job.trim.contigs.summary"
         # self.remote_machine = "headnode"
@@ -38,7 +39,6 @@ class UtilsTests(TestCase):
                                          fastq_file)
         self.summ_file = "{}/{}".format(settings.BASE_DIR,
                                         summ_file)
-        self.mock_md5sum = "7e4f54362bd0f030a623a6aaba27ddba"
         self.machine = "headnode"
         self.cmd = "uname"
         self.cmd_out = "Linux"
@@ -63,7 +63,14 @@ class UtilsTests(TestCase):
         self.TIME_2 = "5:00:01"
         self.NODES_2 = 1
         self.NODELIST_2 = "n1"
-        self.test_job_id = str(uuid.uuid4())
+        self.ref_moth_cmd = 'mothulity mothulity/tests --output-dir mothulity/tests --run bash --job-name test_job'
+        self.test_moth_files = 'mothulity/tests'
+        self.test_moth_cmd_dict = {
+            'job_name': 'test job',
+            'id': self.test_job_id,
+            'job_id_id': self.test_job_id,
+            'amplicon_type': '16S',
+        }
         self.test_job_dir = 'mothulity/tests/{}/'.format(self.test_job_id)
         os.system('mkdir {}'.format(self.test_job_dir))
         os.system('touch {0}1.fastq {0}2.fastq {0}mothur.job.sh {0}analysis_mothur.job.zip'.format(self.test_job_dir))
@@ -93,23 +100,6 @@ class UtilsTests(TestCase):
         """
         self.assertEqual(utils.count_seqs(self.fastq_file), 4779)
 
-    def test_md5sum(self):
-        """
-        Tests whether utils.md5sum returns correct hash when run on file\
-        locally.
-        """
-        self.assertEqual(utils.md5sum(self.fastq_file),
-                         self.mock_md5sum)
-
-    # def test_md5sum_remote(self):
-    #     """
-    #     Tests whether utils.md5sum returns correct hash when run on file\
-    #     rmeotely.
-    #     """
-    #     self.assertEqual(utils.md5sum(self.fastq_file_remote,
-    #                                   remote=True,
-    #                                   machine=self.remote_machine),
-    #                      self.mock_md5sum)
 
     def test_parse_sinfo(self):
         """
@@ -193,6 +183,19 @@ class UtilsTests(TestCase):
                                        self.machine),
                          self.cmd_out)
 
+    def test_render_moth_cd(self):
+        """
+        Tests if the mothulity command is properly rendered.
+        """
+        self.assertEqual(
+            sorted(self.ref_moth_cmd.split(' ')),
+            sorted(utils.render_moth_cmd(
+                moth_files=self.test_moth_files,
+                moth_opts=self.test_moth_cmd_dict,
+                shell='bash'
+                ).split(' '))
+        )
+
     def test_remove_except(self):
         """
         Tests whether only unwanted files are being removed.
@@ -203,6 +206,13 @@ class UtilsTests(TestCase):
             self.test_job_dir_content,
             self.ref_files_to_spare
             )
+
+    def test_isdone(self):
+        """
+        Tests if returns proper value.
+        """
+        self.assertTrue(utils.isdone(self.test_job_dir))
+        self.assertFalse(utils.isdone(self.test_job_dir, '*foobar'))
 
 
 class ViewsResponseTests(TestCase):
