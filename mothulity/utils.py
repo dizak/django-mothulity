@@ -452,14 +452,13 @@ def remove_except(directory,
         directory = directory + '/'
     files = glob('{}*'.format(directory))
     files_to_remove = [i for i in files if not fnmatch(i, pattern)]
-    if safety:
-        try:
-            return sp.check_output(
-                '{} {}'.format(cmd[safety], ' '.join(files_to_remove)),
-                shell=True,
-                ).decode('utf-8')
-        except Exception as e:
-            return False
+    try:
+        return sp.check_output(
+            '{} {}'.format(cmd[safety], ' '.join(files_to_remove)),
+            shell=True,
+            ).decode('utf-8')
+    except Exception as e:
+        return False
 
 
 def change_status(job_id,
