@@ -207,6 +207,13 @@ class UtilsTests(TestCase):
             self.ref_files_to_spare
             )
 
+    def test_isdone(self):
+        """
+        Tests if returns proper value.
+        """
+        self.assertTrue(utils.isdone(self.test_job_dir))
+        self.assertFalse(utils.isdone(self.test_job_dir, '*foobar'))
+
 
 class ViewsResponseTests(TestCase):
     """
