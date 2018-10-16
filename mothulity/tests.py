@@ -30,6 +30,7 @@ class UtilsTests(TestCase):
         long_idle_nodes: int, <61>
             Number of nodes idle in queue long.
         """
+        self.test_job_id = str(uuid.uuid4())
         fastq_file = "mothulity/tests/Mock_S280_L001_R1_001.fastq"
         summ_file = "mothulity/tests/mothur.job.trim.contigs.summary"
         # self.remote_machine = "headnode"
@@ -62,7 +63,14 @@ class UtilsTests(TestCase):
         self.TIME_2 = "5:00:01"
         self.NODES_2 = 1
         self.NODELIST_2 = "n1"
-        self.test_job_id = str(uuid.uuid4())
+        self.ref_moth_cmd = 'mothulity mothulity/tests --output-dir mothulity/tests --run bash --job-name test_job'
+        self.test_moth_files = 'mothulity/tests'
+        self.test_moth_cmd_dict = {
+            'job_name': 'test job',
+            'id': self.test_job_id,
+            'job_id_id': self.test_job_id,
+            'amplicon_type': '16S',
+        }
         self.test_job_dir = 'mothulity/tests/{}/'.format(self.test_job_id)
         os.system('mkdir {}'.format(self.test_job_dir))
         os.system('touch {0}1.fastq {0}2.fastq {0}mothur.job.sh {0}analysis_mothur.job.zip'.format(self.test_job_dir))
@@ -174,6 +182,19 @@ class UtilsTests(TestCase):
         self.assertEqual(utils.ssh_cmd(self.cmd,
                                        self.machine),
                          self.cmd_out)
+
+    def test_render_moth_cd(self):
+        """
+        Tests if the mothulity command is properly rendered.
+        """
+        self.assertEqual(
+            sorted(self.ref_moth_cmd.split(' ')),
+            sorted(utils.render_moth_cmd(
+                moth_files=self.test_moth_files,
+                moth_opts=self.test_moth_cmd_dict,
+                shell='bash'
+                ).split(' '))
+        )
 
     def test_remove_except(self):
         """
