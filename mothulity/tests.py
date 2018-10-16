@@ -63,6 +63,17 @@ class UtilsTests(TestCase):
         self.TIME_2 = "5:00:01"
         self.NODES_2 = 1
         self.NODELIST_2 = "n1"
+        self.test_job_id = str(uuid.uuid4())
+        self.test_job_dir = 'mothulity/tests/{}/'.format(self.test_job_id)
+        os.system('mkdir {}'.format(self.test_job_dir))
+        os.system('touch {0}1.fastq {0}2.fastq {0}mothur.job.sh {0}analysis_mothur.job.zip'.format(self.test_job_dir))
+        self.ref_remove_except = ['analysis_mothur.job.zip']
+
+    def tearDown(self):
+        """
+        Distroys tests left-overs.
+        """
+        os.system('rm -r {}'.format(self.test_job_dir))
 
     def test_sniff_true(self):
         """
@@ -181,6 +192,12 @@ class UtilsTests(TestCase):
         self.assertEqual(utils.ssh_cmd(self.cmd,
                                        self.machine),
                          self.cmd_out)
+
+    def test_remove_except(self):
+        """
+        Tests whether only unwanted files are being removed.
+        """
+        pass
 
 
 class ViewsResponseTests(TestCase):
