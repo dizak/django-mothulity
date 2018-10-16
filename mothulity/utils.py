@@ -4,6 +4,7 @@ import subprocess as sp
 from skbio.io import sniff
 import Bio.SeqIO as sio
 import math
+from fnmatch import fnmatch
 import django
 from django.conf import settings
 from django.shortcuts import get_object_or_404
@@ -434,34 +435,27 @@ def queue_submit(job_id,
 
 
 def remove_except(directory,
-                  extension,
+                  pattern,
                   safety=True):
     """
-    Remove non-recursively everything from the directory except extension.
+    Remove non-recursively everything from the directory except pattern.
 
     Parameters
     -------
     directory: str
         Directory path from which the unwanted files will be removed.
-    extension: str
+    pattern: str
         Files ending with this will NOT be removed from the directory.
     """
+    cmd = {True: 'ls', False: 'rm'}
     if not directory.endswith('/'):
         directory = directory + '/'
     files = glob('{}*'.format(directory))
-    files_to_remove = [i for i in files if extension not in i]
+    files_to_remove = [i for i in files if not fnmatch(i, pattern)]
     if safety:
         try:
             return sp.check_output(
-                'ls {}'.format(' '.join(files_to_remove)),
-                shell=True,
-                ).decode('utf-8')
-        except Exception as e:
-            return False
-    else:
-        try:
-            return sp.check_output(
-                'rm {}'.format(' '.join(files_to_remove)),
+                '{} {}'.format(cmd[safety], ' '.join(files_to_remove)),
                 shell=True,
                 ).decode('utf-8')
         except Exception as e:

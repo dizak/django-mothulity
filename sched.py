@@ -61,11 +61,11 @@ def job():
         print("\nJobID {} Status: submitted. Retries: {}\n".format(i,
                                                                    utils.get_retry(i)))
         job_sshfs_dir = "{}{}/".format(media_url, str(i).replace("-", "_"))
-        if utils.isrunning(i) is False and utils.isdone(job_sshfs_dir) is False and utils.get_retry(i) >= max_retry:
+        if utils.isrunning(i) is False and utils.isdone(job_sshfs_dir, '*shared') is False and utils.get_retry(i) >= max_retry:
             print("JobID above retry limit. Changing its status to <dead>")
             utils.change_status(i, "dead")
             break
-        if utils.isrunning(i) is False and utils.isdone(job_sshfs_dir) is False and utils.get_retry(i) < max_retry:
+        if utils.isrunning(i) is False and utils.isdone(job_sshfs_dir, '*shared') is False and utils.get_retry(i) < max_retry:
             print("JobID {} is NOT done and is NOT runnning. Will be resubmitted".format(i))
             utils.remove_except(job_sshfs_dir, 'fastq', safety=False)
             utils.change_status(i, "pending")
