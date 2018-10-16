@@ -1,0 +1,30 @@
+language: python
+
+python:
+  - "3.6"
+
+before_install:
+  - sudo apt install python-dev
+  - pip3 install virtual-env
+  - python3 -m virtualenv django-mothulity-env
+
+install:
+  - source $HOME/django-mothulity-env/bin/activate
+  - pip install numpy
+  - pip install -r requirements
+  - python setup.py sdist
+  - pip install dist/django-mothulity-*.tar.gz
+  - cd $HOME
+  - django-admin startproject django_project
+  - cd django_project/django_project
+  - wget https://gist.githubusercontent.com/dizak/17838471a52cf5d74484329529262d6d/raw/fbb7f52c9d4e87351d8a28377a5c1ac87c654458/django-mothulity-settings.py
+  - wget https://gist.githubusercontent.com/dizak/1625ba563ccab2b953a4c1cdeb840204/raw/9a454deb770989216411308d91e9f48b9136eafc/django-mothulity-urls.py
+  - mv django-mothulity-setttings.py settings.py
+  - mv django-mothulity-urls.py urls.py
+
+before_script:
+  - python manage.py makemigrations
+  - python manage.py migrate
+
+script:
+  - python manage.py test
