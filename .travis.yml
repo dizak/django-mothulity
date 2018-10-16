@@ -17,6 +17,7 @@ install:
   - mv django-mothulity-urls.py urls.py
 
 before_script:
+  - cd $HOME/django_project/
   - python manage.py makemigrations
   - python manage.py migrate
 
