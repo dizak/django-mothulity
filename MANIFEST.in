@@ -1,3 +1,4 @@
 include README.md
+include requirements.txt
 recursive-include mothulity/static *
 recursive-include mothulity/templates *
