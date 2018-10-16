@@ -13,6 +13,7 @@ install:
   - cd django_project/django_project
   - wget https://gist.githubusercontent.com/dizak/17838471a52cf5d74484329529262d6d/raw/fbb7f52c9d4e87351d8a28377a5c1ac87c654458/django-mothulity-settings.py
   - wget https://gist.githubusercontent.com/dizak/1625ba563ccab2b953a4c1cdeb840204/raw/9a454deb770989216411308d91e9f48b9136eafc/django-mothulity-urls.py
+  - tree $HOME/django_project
   - mv django-mothulity-setttings.py settings.py
   - mv django-mothulity-urls.py urls.py
 
