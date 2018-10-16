@@ -569,25 +569,3 @@ def isdone(directory,
         return True
     except Exception as e:
         return False
-
-
-def get_from_cluster(filename,
-                     upld_dir,
-                     headnode_dir):
-    """
-    Copy zipped analysis file from the computing cluster back to the
-    web-server and check md5sum afterwards.
-
-    Parameters
-    -------
-    filename: str
-        Name of file to copy. Glob is accepted.
-    upld_dir: str
-        Path to files on the web-service server.
-    headnode_dir: str
-        Path to files on the computing cluster.
-    """
-    sp.call("scp headnode:{}{} {}".format(headnode_dir,
-                                          filename,
-                                          upld_dir),
-            shell=True)
