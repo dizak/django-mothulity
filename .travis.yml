@@ -1,0 +1,25 @@
+language: python
+
+python:
+  - "3.6"
+
+install:
+  - pip install numpy
+  - pip install -r requirements.txt
+  - python setup.py sdist
+  - pip install dist/django-mothulity-*.tar.gz
+  - cd $HOME
+  - django-admin startproject django_project
+  - cd django_project/django_project
+  - wget https://gist.githubusercontent.com/dizak/17838471a52cf5d74484329529262d6d/raw/586ae9afd9c0892aa0e11bffabb65b6f9f422581/django-mothulity-settings.py
+  - wget https://gist.githubusercontent.com/dizak/1625ba563ccab2b953a4c1cdeb840204/raw/fb0d64c9ce13ebccde72f4ebef48bb5f2c190faf/django-mothulity-urls.py
+  - mv django-mothulity-settings.py settings.py
+  - mv django-mothulity-urls.py urls.py
+
+before_script:
+  - cd $HOME/django_project/
+  - python manage.py makemigrations
+  - python manage.py migrate
+
+script:
+  - python manage.py test
