@@ -30,6 +30,10 @@ def index(request,
     django.template
         Template rendered to HTML.
     """
+    upload_errors = {
+        'uneven': 'Sorry, it seems you uploaded an uneven number of files...',
+        'format': 'Sorry, it seems you uploaded something else than FASTQ file...'
+    }
     if request.method == "POST":
         form = FileFieldForm(request.POST,
                              request.FILES)
@@ -39,6 +43,14 @@ def index(request,
                                       str(job_id).replace("-", "_"))
             sp.check_output("mkdir {}".format(upld_dir), shell=True).decode('utf-8')
             upld_files = request.FILES.getlist("file_field")
+            if len(upld_files) % 2 != 0:
+                sp.check_output("rm -r {}".format(upld_dir), shell=True).decode('utf-8')
+                form = FileFieldForm()
+                return render(request,
+                              "mothulity/index.html.jj2",
+                              {"articles": Article.objects.all(),
+                               "form": form,
+                               "upload_error": upload_errors['uneven']})
             for upfile in upld_files:
                 utils.write_file(upfile,
                                  upld_dir)
@@ -54,7 +66,7 @@ def index(request,
                                   "mothulity/index.html.jj2",
                                   {"articles": Article.objects.all(),
                                    "form": form,
-                                   "upload_error": True})
+                                   "upload_error": upload_errors['file_format']})
             seqs_count = utils.count_seqs("{}*fastq".format(upld_dir))
             job = JobID(job_id=job_id)
             job.save()
