@@ -32,6 +32,7 @@ def index(request,
     """
     upload_errors = {
         'uneven': 'Sorry, it seems you uploaded an uneven number of files...',
+        'mothulity_fc': 'Sorry, it seems there is something wrong with your file names...',
         'format': 'Sorry, it seems you uploaded something else than FASTQ file...'
     }
     if request.method == "POST":
@@ -41,6 +42,10 @@ def index(request,
             job_id = uuid.uuid4()
             upld_dir = "{}{}/".format(settings.MEDIA_URL,
                                       str(job_id).replace("-", "_"))
+            headnode_dir = "{}{}/".format(
+                settings.HEADNODE_PREFIX_URL,
+                str(job_id).replace("-", "_"),
+            )
             sp.check_output("mkdir {}".format(upld_dir), shell=True).decode('utf-8')
             upld_files = request.FILES.getlist("file_field")
             if len(upld_files) % 2 != 0:
@@ -67,6 +72,15 @@ def index(request,
                                   {"articles": Article.objects.all(),
                                    "form": form,
                                    "upload_error": upload_errors['file_format']})
+            try:
+                utils.ssh_cmd('mothulity_fc {}'.format(headnode_dir))
+            except:
+                form = FileFieldForm()
+                return render(request,
+                              "mothulity/index.html.jj2",
+                              {"articles": Article.objects.all(),
+                               "form": form,
+                               "upload_error": upload_errors['mothulity_fc']})
             seqs_count = utils.count_seqs("{}*fastq".format(upld_dir))
             job = JobID(job_id=job_id)
             job.save()
