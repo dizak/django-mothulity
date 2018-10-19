@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import find_packages, setup
 from mothulity import __version__ as VERSION
 from mothulity import __author__ as AUTHOR
 
