@@ -10,6 +10,7 @@ import os
 import uuid
 from mothulity import views, models, forms, utils
 
+base_dir = os.path.abspath(os.path.dirname(__file__))
 
 class UtilsTests(TestCase):
     """
@@ -31,19 +32,13 @@ class UtilsTests(TestCase):
             Number of nodes idle in queue long.
         """
         self.test_job_id = str(uuid.uuid4())
-        fastq_file = "mothulity/tests/Mock_S280_L001_R1_001.fastq"
-        summ_file = "mothulity/tests/mothur.job.trim.contigs.summary"
-        # self.remote_machine = "headnode"
-        # self.fastq_file_remote = "/home/dizak/misc/mothulity_django_tests/Mock_S280_L001_R1_001.fastq"
-        self.fastq_file = "{}/{}".format(settings.BASE_DIR,
-                                         fastq_file)
-        self.summ_file = "{}/{}".format(settings.BASE_DIR,
-                                        summ_file)
+        self.fastq_file = "{}/tests/Mock_S280_L001_R1_001.fastq".format(base_dir)
+        self.summ_file = "{}/tests/mothur.job.trim.contigs.summary".format(base_dir)
         self.machine = "headnode"
         self.cmd = "uname"
         self.cmd_out = "Linux"
-        self.sinfo_file = "mothulity/tests/sinfo.log"
-        self.squeue_file = "mothulity/tests/squeue.log"
+        self.sinfo_file = "{}/tests/sinfo.log".format(base_dir)
+        self.squeue_file = "{}/tests/squeue.log".format(base_dir)
         self.long_idle_nodes = 61
         self.accel_idle_nodes = 12
         self.accel_alloc_nodes = 3
@@ -63,15 +58,15 @@ class UtilsTests(TestCase):
         self.TIME_2 = "5:00:01"
         self.NODES_2 = 1
         self.NODELIST_2 = "n1"
-        self.ref_moth_cmd = 'mothulity mothulity/tests --output-dir mothulity/tests --run bash --job-name test_job'
-        self.test_moth_files = 'mothulity/tests'
+        self.ref_moth_cmd = 'mothulity tests --output-dir tests --run bash --job-name test_job'
+        self.test_moth_files = 'tests'
         self.test_moth_cmd_dict = {
             'job_name': 'test job',
             'id': self.test_job_id,
             'job_id_id': self.test_job_id,
             'amplicon_type': '16S',
         }
-        self.test_job_dir = 'mothulity/tests/{}/'.format(self.test_job_id)
+        self.test_job_dir = '{}/tests/{}/'.format(base_dir, self.test_job_id)
         os.system('mkdir {}'.format(self.test_job_dir))
         os.system('touch {0}1.fastq {0}2.fastq {0}mothur.job.sh {0}analysis_mothur.job.zip'.format(self.test_job_dir))
         self.ref_files_to_spare = ['analysis_mothur.job.zip']
@@ -175,13 +170,13 @@ class UtilsTests(TestCase):
                                             "TIME"),
                          self.TIME_2)
 
-    def test_ssh_cmd(self):
-        """
-        Tests whether commands via ssh are successful.
-        """
-        self.assertEqual(utils.ssh_cmd(self.cmd,
-                                       self.machine),
-                         self.cmd_out)
+    # def test_ssh_cmd(self):
+    #     """
+    #     Tests whether commands via ssh are successful.
+    #     """
+    #     self.assertEqual(utils.ssh_cmd(self.cmd,
+    #                                    self.machine),
+    #                      self.cmd_out)
 
     def test_render_moth_cd(self):
         """
