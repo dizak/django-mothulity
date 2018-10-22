@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/dizak/django-mothulity.svg?branch=master)](https://travis-ci.org/dizak/django-mothulity)
+
 # mothulity - web interface
 
 Web Interface and database/job scheduler for [mothulity](https://github.com/dizak/mothulity).
