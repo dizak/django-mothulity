@@ -23,3 +23,7 @@ before_script:
 
 script:
   - python manage.py test mothulity
+
+notifications:
+    on_success: never
+    - on_failure: always
