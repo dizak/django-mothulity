@@ -8,6 +8,18 @@ The main principle is to:
 1. Present HTML front-end to the user which gathers submission data.
 2. Run a separate sched.py script which takes care of reading what was gathered in the database, submits it to [SLURM](https://slurm.schedmd.com/) and watches the submitted process.
 
+### Installation for Production (virtual environment is advised, as always)
+
+1. ```pip install numpy```.
+
+1. ```pip install -r requirements.txt```.
+
+1. ```pip install django-mothulity-*.tar.gz``` - the project will most probably NOT be distributed.
+
+1. ```django-admin startproject <name_of_project>```.
+
+1. Modify ```<name_of_project>/settings.py``` and ```<name_of_project>/urls.py``` as indicated in the [Installation for Development](#installation-for-development) section.
+
 ### Installation for Development
 
 
