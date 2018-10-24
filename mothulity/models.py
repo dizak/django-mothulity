@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
+from django.contrib.sites.models import Site
 from froala_editor.fields import FroalaField
 from django.utils import timezone
 import pytz
@@ -74,3 +75,16 @@ class Article(models.Model):
     """
     title = models.CharField(max_length=100)
     content = FroalaField()
+
+
+class HPCSettings(models.Model):
+    """
+    Model for HPC setting, eg. the minimum number of free nodes.
+    """
+    site = models.OneToOneField(Site, on_delete=models.CASCADE)
+    free_Ns_minimum_number = models.IntegerField(default=20)
+    free_PHIs_minimum_number = models.IntegerField(default=5)
+    retry_maximum_number = models.IntegerField(default=1)
+    # 
+    # def __str__(self):
+    #     return self.site
