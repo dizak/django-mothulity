@@ -2,6 +2,7 @@
 
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
+from django.contrib.sites.shortcuts import get_current_site
 from django.utils import timezone
 from mothulity.forms import FileFieldForm, OptionsForm
 from mothulity.models import *
@@ -94,6 +95,8 @@ def index(request,
                            "job": job_id})
     else:
         form = FileFieldForm()
+    site = Site.objects.get_current()
+    print(site)
     return render(request,
                   "mothulity/index.html.jj2",
                   {"articles": Article.objects.all(),
