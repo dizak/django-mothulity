@@ -11,8 +11,6 @@ from . import utils
 import uuid
 import subprocess as sp
 
-# Create your views here.
-
 
 def index(request,
           seqs_limit=900000):
@@ -31,6 +29,8 @@ def index(request,
     django.template
         Template rendered to HTML.
     """
+    site = Site.objects.get(id=2)
+    path_settings = site.pathsettings
     upload_errors = {
         'uneven': 'Sorry, it seems you uploaded an uneven number of files...',
         'mothulity_fc': 'Sorry, it seems there is something wrong with your file names...',
@@ -41,10 +41,10 @@ def index(request,
                              request.FILES)
         if form.is_valid():
             job_id = uuid.uuid4()
-            upld_dir = "{}{}/".format(settings.MEDIA_URL,
+            upld_dir = "{}{}/".format(path_settings.upload_path,
                                       str(job_id).replace("-", "_"))
             headnode_dir = "{}{}/".format(
-                settings.HEADNODE_PREFIX_URL,
+                path_settings.hpc_prefix_path,
                 str(job_id).replace("-", "_"),
             )
             sp.check_output("mkdir {}".format(upld_dir), shell=True).decode('utf-8')
