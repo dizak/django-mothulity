@@ -41,11 +41,9 @@ The main principle is to:
 
 1. Type ```django-admin startproject <name_of_project> django-mothulity``` - this will create a Django project **WITHIN** the the cloned repo. This is intended.
 
-1. Add
-```python
-mothulity.apps.MothulityConfig
-```
-to ```<name_of_project>/<name_of_project>/settings.py INSTALLED_APPS``` list.
+1. Add ```'django.contrib.sites',``` and ```mothulity.apps.MothulityConfig``` to ```<name_of_project>/<name_of_project>/settings.py INSTALLED_APPS``` list.
+
+1. Add ```'localhost'``` and ```'<your.domain.com>'``` to ```<name_of_project>/settings.py ALLOWED_HOSTS```.
 
 1. Add ```from django.conf.urls import include, url``` to ```<name_of_project>/<name_of_project>/urls.py```.
 
@@ -54,6 +52,12 @@ to ```<name_of_project>/<name_of_project>/settings.py INSTALLED_APPS``` list.
 1. Run ```python manage.py makemigrations && python manage.py migrate```.
 
 1. Run ```python manage.py test```.
+
+1. In the Admin Panel:
+
+  - Add <your.domain.com> to Sites.
+
+  - Add Path settings and Hpc settings. The default ones should be OK.
 
 1. Run ```python manage.py runserver```.
 
