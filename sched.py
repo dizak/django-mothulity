@@ -10,8 +10,6 @@ from time import sleep
 
 import django
 from django.conf import settings
-from django.shortcuts import get_object_or_404
-from django.forms.models import model_to_dict
 
 sys.path.append(os.path.abspath(sys.argv[1]))
 os.environ.setdefault(
@@ -23,6 +21,7 @@ os.environ.setdefault(
 django.setup()
 
 from mothulity import utils
+from mothulity import models
 
 min_ns_free = settings.MIN_NS_FREE
 min_phis_free = settings.MIN_PHIS_FREE
@@ -37,6 +36,8 @@ def job():
     """
     Retrieve pending jobs and submit them properly to the computing cluster.
     """
+    site = models.Site.objects.get(id=2)
+    hpc_settings = site.hpcsettings
     for i in utils.get_pending_ids():
         print("\nJobID {} Status: pending\n".format(i))
         idle_ns = utils.parse_sinfo(utils.ssh_cmd("sinfo"), "long", "idle")
