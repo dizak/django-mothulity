@@ -27,6 +27,10 @@ class ArticleAdmin(admin.ModelAdmin):
     list_display = ("title",)
 
 
+class PathSettingsAdmin(admin.ModelAdmin):
+    list_display = ('site',)
+
+
 class HPCSettingsAdmin(admin.ModelAdmin):
     list_display = ('site',)
 
@@ -36,4 +40,5 @@ admin.site.register(SeqsStats, SeqsStatsAdmin)
 admin.site.register(SubmissionData, SubmissionDataAdmin)
 admin.site.register(JobStatus, JobStatusAdmin)
 admin.site.register(Article, ArticleAdmin)
+admin.site.register(PathSettings, PathSettingsAdmin)
 admin.site.register(HPCSettings, HPCSettingsAdmin)
