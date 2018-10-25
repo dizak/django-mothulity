@@ -18,7 +18,7 @@ The main principle is to:
 
 1. ```django-admin startproject <name_of_project>```.
 
-1. Modify ```<name_of_project>/settings.py``` and ```<name_of_project>/urls.py``` as indicated in the [Installation for Development](#installation-for-development) section.
+1. Add ```SITE_ID=2``` to ```<name_of_project>/settings.py```.
 
 ### Installation for Development
 
