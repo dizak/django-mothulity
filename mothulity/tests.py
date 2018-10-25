@@ -210,28 +210,28 @@ class UtilsTests(TestCase):
         self.assertFalse(utils.isdone(self.test_job_dir, '*foobar'))
 
 
-class ViewsResponseTests(TestCase):
-    """
-    Tests for the response codes.
-    """
-    def setUp(self):
-        """
-        Sets up class level attributes for the tests.
-
-        Parameters
-        -------
-        urls_list: list of str
-            List urls postfixes to be tested by django's test client.
-        """
-        self.urls_list = ["index"]
-
-    def test_response_code(self):
-        """
-        Tests whether response code of available urls equals <200>.
-        """
-        for url in self.urls_list:
-            response = self.client.get(reverse("mothulity:{}".format(url)))
-            self.assertIs(response.status_code, 200)
+# class ViewsResponseTests(TestCase):
+#     """
+#     Tests for the response codes.
+#     """
+#     def setUp(self):
+#         """
+#         Sets up class level attributes for the tests.
+#
+#         Parameters
+#         -------
+#         urls_list: list of str
+#             List urls postfixes to be tested by django's test client.
+#         """
+#         self.urls_list = ["index"]
+#
+#     def test_response_code(self):
+#         """
+#         Tests whether response code of available urls equals <200>.
+#         """
+#         for url in self.urls_list:
+#             response = self.client.get(reverse("mothulity:{}".format(url)))
+#             self.assertIs(response.status_code, 200)
 
 
 class ModelsTest(TestCase):
