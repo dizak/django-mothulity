@@ -85,6 +85,3 @@ class HPCSettings(models.Model):
     free_Ns_minimum_number = models.IntegerField(default=20)
     free_PHIs_minimum_number = models.IntegerField(default=5)
     retry_maximum_number = models.IntegerField(default=1)
-    # 
-    # def __str__(self):
-    #     return self.site
