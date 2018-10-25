@@ -18,6 +18,8 @@ The main principle is to:
 
 1. ```django-admin startproject <name_of_project>```.
 
+1. Add ```'django.contrib.sites',``` to ```<name_of_project>/settings.py```.
+
 1. Add ```SITE_ID=2``` to ```<name_of_project>/settings.py```.
 
 ### Installation for Development
