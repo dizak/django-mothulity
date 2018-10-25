@@ -95,8 +95,6 @@ def index(request,
                            "job": job_id})
     else:
         form = FileFieldForm()
-    site = Site.objects.get_current()
-    print(site)
     return render(request,
                   "mothulity/index.html.jj2",
                   {"articles": Article.objects.all(),
