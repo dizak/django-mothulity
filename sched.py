@@ -20,7 +20,9 @@ django.setup()
 from mothulity import utils
 from mothulity import models
 
-site = models.Site.objects.get(id=2)
+site = models.Site.objects.get(
+    domain=[i for i in settings.ALLOWED_HOSTS if i != 'localhost'][0]
+    )
 hpc_settings = site.hpcsettings
 
 
@@ -28,7 +30,9 @@ def job():
     """
     Retrieve pending jobs and submit them properly to the computing cluster.
     """
-    site = models.Site.objects.get(id=2)
+    site = models.Site.objects.get(
+        domain=[i for i in settings.ALLOWED_HOSTS if i != 'localhost'][0]
+        )
     hpc_settings = site.hpcsettings
     path_settings = site.pathsettings
     for i in utils.get_pending_ids():

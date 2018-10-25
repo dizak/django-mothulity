@@ -29,7 +29,7 @@ def index(request,
     django.template
         Template rendered to HTML.
     """
-    site = Site.objects.get(id=2)
+    site = Site.objects.get(domain=[i for i in settings.ALLOWED_HOSTS if i != 'localhost'][0])
     path_settings = site.pathsettings
     upload_errors = {
         'uneven': 'Sorry, it seems you uploaded an uneven number of files...',
