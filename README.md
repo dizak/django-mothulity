@@ -18,9 +18,19 @@ The main principle is to:
 
 1. ```django-admin startproject <name_of_project>```.
 
-1. Add ```'django.contrib.sites',``` to ```<name_of_project>/settings.py```.
+1. Add ```'django.contrib.sites',``` and ```'mothulity,'``` to ```<name_of_project>/settings.py INSTALLED_APPS```.
 
-1. Add ```SITE_ID=2``` to ```<name_of_project>/settings.py```.
+1. Add ```'localhost'``` and ```'<your.domain.com>'``` to ```<name_of_project>/settings.py ALLOWED_HOSTS```.
+
+1. ```python manage.py tests```. You can continue if all the tests are passed.
+
+1. ```python manage.py createsuperuser```
+
+1. In the Admin Panel:
+
+  - Add <your.domain.com> to Sites.
+
+  - Add Path settings and Hpc settings. The default ones should be OK.
 
 ### Installation for Development
 
@@ -36,25 +46,6 @@ The main principle is to:
 mothulity.apps.MothulityConfig
 ```
 to ```<name_of_project>/<name_of_project>/settings.py INSTALLED_APPS``` list.
-
-1. Add  ```MEDIA_URL``` and ```HEADNODE_PREFIX_URL``` to ```<name_of_project>/<name_of_project>/settings.py```
-
-  - MEDIA_URL a directory from the computing cluster mounted on the web-server.
-
-  - HEADNODE_PREFIX_URL point to the same directory that MEDIA_URL does but from the computing cluster itself. It must be added for a proper path resolution.
-
-  **EACH URL MUST HAVE TRAILING SLASH!**
-
-1. Add variables that are used by the scheduler, these values are just examples:
-
-```python
-MIN_NS_FREE = 20
-MIN_PHIS_FREE = 5
-MAX_RETRY = 1
-FILES_TO_COPY = ["*shared",
-                 "*cons.tax.summary"]
-INTERVAL = 5
-```
 
 1. Add ```from django.conf.urls import include, url``` to ```<name_of_project>/<name_of_project>/urls.py```.
 
