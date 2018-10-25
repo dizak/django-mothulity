@@ -4,9 +4,6 @@
 import os
 import sys
 import schedule
-import subprocess as sp
-from glob import glob
-from time import sleep
 
 import django
 from django.conf import settings
