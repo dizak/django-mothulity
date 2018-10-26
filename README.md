@@ -36,6 +36,33 @@ These instructions are compliant to [this tutorial at DigitalOcean](https://www.
 
 Updates of the ```django-mothulity``` app should require nothing more than ```pip install --upgrade django-mothulity-*.tar.gz```.
 
+1. Daemonize ```sched.py```:
+
+  - Create /etc/systemd/system/django-mothulity-scheduler.service file with this content:
+
+  ```bash
+  [Unit]
+  Description=django-mothulity job scheduler
+
+  [Service]
+  User=<username>
+  Group=www-data
+  ExecStart=sched.py
+
+  [Install]
+  WantedBy=multi-user.target
+  ```
+
+  - ```sudo systemctl start django-mothulity-scheduler``` - start the service.
+
+  - ```sudo systemctl status django-mothulity-scheduler``` - check if everything is all right. If you make changes to the Unit File - run ```sudo systemctl daemon-reload```.
+
+  - ```sudo systemctl enable django-mothulity-scheduler``` - start the service on boot.
+
+**Important**
+
+The scheduler service has to be restarted for the changes to HPC Settings Interval to take place.
+
 ### Installation for Development
 
 
