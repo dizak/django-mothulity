@@ -8,17 +8,60 @@ The main principle is to:
 1. Present HTML front-end to the user which gathers submission data.
 2. Run a separate sched.py script which takes care of reading what was gathered in the database, submits it to [SLURM](https://slurm.schedmd.com/) and watches the submitted process.
 
-### Installation for Production (virtual environment is advised, as always)
+django-mothulity stores its settings in the database - there is no need for any modification in the code (including the paths, scheduler and HPC settings) once it is deployed. The settings are bound to the domain name other than ```localhost``` and specified in ```<name_of_project>/settings.py ALLOWED_HOSTS```. Once this is specified, these settings must specified in the Admin Panel. This solution does NOT allow for using more than domain name - the settings will always bound to first object from the ```ALLOWED_HOSTS``` other than ```localhost```.
 
-1. ```pip install numpy```.
+### Installation for Production - NGINX and Gunicorn (virtual environment is advised, as always)
 
-1. ```pip install -r requirements.txt```.
+These instructions are compliant to [this tutorial at DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-18-04) but with the standard SQL database. Neverthless, is should work with any database backend.
 
-1. ```pip install django-mothulity-*.tar.gz``` - the project will most probably NOT be distributed.
+1. Setup the production NGINX server and the Gunicorn WSGI as indicated in the [DigitalOcean tutorial](https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-18-04). Working in the virtual environment, created during the server setup, follow the instructions below.
 
-1. ```django-admin startproject <name_of_project>```.
+1. ```pip install django-mothulity-*.tar.gz``` - the project will most probably NOT be distributed with the PyPI.
 
-1. Modify ```<name_of_project>/settings.py``` and ```<name_of_project>/urls.py``` as indicated in the [Installation for Development](#installation-for-development) section.
+1. Add ```'django.contrib.sites',``` and ```'mothulity',``` to ```<name_of_project>/settings.py INSTALLED_APPS```.
+
+1. It is assumed that ```'localhost'``` and ```'<your.domain.com>'``` are in the ```<name_of_project>/settings.py ALLOWED_HOSTS``` already. If not - add it.
+
+1. ```python manage.py test mothulity```. - check if everything is all right.
+
+1. ```python manage.py createsuperuser``` - create the Admin user and the Admin Panel.
+
+1. ```python manage.py makemigrations && python manage.py migrate``` - setup the database.
+
+1. In the Admin Panel:
+
+  - Add <your.domain.com> to Sites.
+
+  - Add Path settings and Hpc settings. The default ones should be OK.
+
+Updates of the ```django-mothulity``` app should require nothing more than ```pip install --upgrade django-mothulity-*.tar.gz```.
+
+1. Daemonize ```sched.py```:
+
+  - Create /etc/systemd/system/django-mothulity-scheduler.service file with this content:
+
+  ```bash
+  [Unit]
+  Description=django-mothulity job scheduler
+
+  [Service]
+  User=<username>
+  Group=www-data
+  ExecStart=sched.py
+
+  [Install]
+  WantedBy=multi-user.target
+  ```
+
+  - ```sudo systemctl start django-mothulity-scheduler``` - start the service.
+
+  - ```sudo systemctl status django-mothulity-scheduler``` - check if everything is all right. If you make changes to the Unit File - run ```sudo systemctl daemon-reload```.
+
+  - ```sudo systemctl enable django-mothulity-scheduler``` - start the service on boot.
+
+**Important**
+
+The scheduler service has to be restarted for the changes to HPC Settings Interval to take place.
 
 ### Installation for Development
 
@@ -29,30 +72,9 @@ The main principle is to:
 
 1. Type ```django-admin startproject <name_of_project> django-mothulity``` - this will create a Django project **WITHIN** the the cloned repo. This is intended.
 
-1. Add
-```python
-mothulity.apps.MothulityConfig
-```
-to ```<name_of_project>/<name_of_project>/settings.py INSTALLED_APPS``` list.
+1. Add ```'django.contrib.sites',``` and ```mothulity.apps.MothulityConfig``` to ```<name_of_project>/<name_of_project>/settings.py INSTALLED_APPS``` list.
 
-1. Add  ```MEDIA_URL``` and ```HEADNODE_PREFIX_URL``` to ```<name_of_project>/<name_of_project>/settings.py```
-
-  - MEDIA_URL a directory from the computing cluster mounted on the web-server.
-
-  - HEADNODE_PREFIX_URL point to the same directory that MEDIA_URL does but from the computing cluster itself. It must be added for a proper path resolution.
-
-  **EACH URL MUST HAVE TRAILING SLASH!**
-
-1. Add variables that are used by the scheduler, these values are just examples:
-
-```python
-MIN_NS_FREE = 20
-MIN_PHIS_FREE = 5
-MAX_RETRY = 1
-FILES_TO_COPY = ["*shared",
-                 "*cons.tax.summary"]
-INTERVAL = 5
-```
+1. Add ```'localhost'``` and ```'<your.domain.com>'``` to ```<name_of_project>/settings.py ALLOWED_HOSTS``` - it is needed for the Path Settings and HPC Settings which are bound to the Site's domain and name. Path Settings and HPC Settings work with only one domain name, other that localhost and are independent of the Site's ID. There is no need for adding the ```SITE_ID``` variable to the ```<name_of_project>/<name_of_project>/settings.py```. See [this documentation](https://docs.djangoproject.com/pl/2.1/ref/contrib/sites/) for more details about the Django's Site framework.
 
 1. Add ```from django.conf.urls import include, url``` to ```<name_of_project>/<name_of_project>/urls.py```.
 
@@ -61,6 +83,12 @@ INTERVAL = 5
 1. Run ```python manage.py makemigrations && python manage.py migrate```.
 
 1. Run ```python manage.py test```.
+
+1. In the Admin Panel:
+
+  - Add <your.domain.com> to Sites.
+
+  - Add Path settings and Hpc settings. The default ones should be OK.
 
 1. Run ```python manage.py runserver```.
 
@@ -72,6 +100,6 @@ INTERVAL = 5
 
 ### Requirements
 
-SSH keys exchanged with the computing cluster.
-Working directory used by ```MEDIA_URL``` and ```HEADNODE_PREFIX_URL``` mounted on the web-server, eg
-with ```sshfs```.
+- SSH keys exchanged with the computing cluster.
+
+- The same directory mounted at the Web-Server and the HPC. Paths set-up with the ```PathSettings``` available at the Admin Panel.

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
+from django.contrib.sites.models import Site
 from froala_editor.fields import FroalaField
 from django.utils import timezone
 import pytz
@@ -74,3 +75,43 @@ class Article(models.Model):
     """
     title = models.CharField(max_length=100)
     content = FroalaField()
+
+
+class PathSettings(models.Model):
+    """
+    Model for the upload and HPC paths.
+    """
+    site = models.OneToOneField(Site, on_delete=models.CASCADE)
+    upload_path = models.CharField(
+        default='/mnt/mothulity_HPC/',
+        max_length=300,
+        help_text='Input files upload path. It must point to the location ON THE WEBSERVER which also MOUNTED FROM HPC. MUST CONTAIN TRAILING SLASH.',
+        )
+    hpc_prefix_path = models.CharField(
+        default='/home/mothulity/jobs/',
+        max_length=300,
+        help_text='Must point to the same location as the above upload_path but from the HPC ITSELF. MUST CONTAIN TRAILING SLASH.'
+    )
+
+
+class HPCSettings(models.Model):
+    """
+    Model for HPC setting, eg. the minimum number of free nodes.
+    """
+    site = models.OneToOneField(Site, on_delete=models.CASCADE)
+    free_Ns_minimum_number = models.IntegerField(
+        default=20,
+        help_text='Minimum number of free N nodes in order to submit the job.',
+        )
+    free_PHIs_minimum_number = models.IntegerField(
+        default=5,
+        help_text='Minimum number of free PHI nodes in order to submit the job.',
+        )
+    retry_maximum_number = models.IntegerField(
+        default=1,
+        help_text='Maximum number of resubmissions before a failed job is removed.'
+        )
+    scheduler_interval = models.IntegerField(
+        default=300,
+        help_text='Time interval (in seconds) for the scheduler. Values above 30 are recommended due to the delays in the database and SLURM communication. For changes to apply the scheduler services must be restarted.'
+        )

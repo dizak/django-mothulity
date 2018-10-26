@@ -8,6 +8,7 @@ import pytz
 from io import BytesIO
 import os
 import uuid
+from random import randint
 from mothulity import views, models, forms, utils
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
@@ -224,6 +225,19 @@ class ViewsResponseTests(TestCase):
             List urls postfixes to be tested by django's test client.
         """
         self.urls_list = ["index"]
+        self.settings_domain = [
+            i for i in settings.ALLOWED_HOSTS if i != 'localhost'
+        ][0]
+        site = models.Site(id=randint(1, 10))
+        site.domain = self.settings_domain
+        site.name = 'mothulity'
+        site.save()
+        path_settings = models.PathSettings(
+            site=site,
+            upload_path='/home/foobar/',
+            hpc_prefix_path='/home/foobar/',
+        )
+        path_settings.save()
 
     def test_response_code(self):
         """
@@ -231,7 +245,7 @@ class ViewsResponseTests(TestCase):
         """
         for url in self.urls_list:
             response = self.client.get(reverse("mothulity:{}".format(url)))
-            self.assertIs(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
 
 
 class ModelsTest(TestCase):

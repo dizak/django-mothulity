@@ -4,14 +4,9 @@
 import os
 import sys
 import schedule
-import subprocess as sp
-from glob import glob
-from time import sleep
 
 import django
 from django.conf import settings
-from django.shortcuts import get_object_or_404
-from django.forms.models import model_to_dict
 
 sys.path.append(os.path.abspath(sys.argv[1]))
 os.environ.setdefault(
@@ -23,49 +18,52 @@ os.environ.setdefault(
 django.setup()
 
 from mothulity import utils
+from mothulity import models
 
-min_ns_free = settings.MIN_NS_FREE
-min_phis_free = settings.MIN_PHIS_FREE
-max_retry = settings.MAX_RETRY
-files_to_copy = settings.FILES_TO_COPY
-interval = settings.INTERVAL
-headnode_prefix = settings.HEADNODE_PREFIX_URL
-media_url = settings.MEDIA_URL
+site = models.Site.objects.get(
+    domain=[i for i in settings.ALLOWED_HOSTS if i != 'localhost'][0]
+    )
+hpc_settings = site.hpcsettings
 
 
 def job():
     """
     Retrieve pending jobs and submit them properly to the computing cluster.
     """
+    site = models.Site.objects.get(
+        domain=[i for i in settings.ALLOWED_HOSTS if i != 'localhost'][0]
+        )
+    hpc_settings = site.hpcsettings
+    path_settings = site.pathsettings
     for i in utils.get_pending_ids():
         print("\nJobID {} Status: pending\n".format(i))
         idle_ns = utils.parse_sinfo(utils.ssh_cmd("sinfo"), "long", "idle")
         idle_phis = utils.parse_sinfo(utils.ssh_cmd("sinfo"), "accel", "idle")
         if utils.get_seqs_count(i) > 500000:
-            if idle_phis > min_phis_free:
-                if utils.queue_submit(i, headnode_prefix) is True:
+            if idle_phis > hpc_settings.free_PHIs_minimum_number:
+                if utils.queue_submit(i, path_settings.hpc_prefix_path) is True:
                     utils.change_status(i)
                     print("JobID {} submitted".format(i))
             else:
                 print("Only {} phi nodes free. {} phi must stay free".format(idle_phis,
-                                                                             min_phis_free))
+                                                                             hpc_settings.free_PHIs_minimum_number))
         if utils.get_seqs_count(i) < 500000:
-            if idle_ns > min_ns_free:
-                if utils.queue_submit(i, headnode_prefix) is True:
+            if idle_ns > hpc_settings.free_Ns_minimum_number:
+                if utils.queue_submit(i, path_settings.hpc_prefix_path) is True:
                     utils.change_status(i)
                     print("JobID {} submitted".format(i))
             else:
                 print("Only {} n nodes free. {} n nodes must stay free".format(idle_ns,
-                                                                               min_ns_free))
+                                                                               hpc_settings.free_Ns_minimum_number))
     for i in utils.get_ids_with_status("submitted"):
         print("\nJobID {} Status: submitted. Retries: {}\n".format(i,
                                                                    utils.get_retry(i)))
-        job_sshfs_dir = "{}{}/".format(media_url, str(i).replace("-", "_"))
-        if utils.isrunning(i) is False and utils.isdone(job_sshfs_dir, '*shared') is False and utils.get_retry(i) >= max_retry:
+        job_sshfs_dir = "{}{}/".format(path_settings.upload_path, str(i).replace("-", "_"))
+        if utils.isrunning(i) is False and utils.isdone(job_sshfs_dir, '*shared') is False and utils.get_retry(i) >= hpc_settings.retry_maximum_number:
             print("JobID above retry limit. Changing its status to <dead>")
             utils.change_status(i, "dead")
             break
-        if utils.isrunning(i) is False and utils.isdone(job_sshfs_dir, '*shared') is False and utils.get_retry(i) < max_retry:
+        if utils.isrunning(i) is False and utils.isdone(job_sshfs_dir, '*shared') is False and utils.get_retry(i) < hpc_settings.retry_maximum_number:
             print("JobID {} is NOT done and is NOT runnning. Will be resubmitted".format(i))
             utils.remove_except(job_sshfs_dir, 'fastq', safety=False)
             utils.change_status(i, "pending")
@@ -77,13 +75,13 @@ def job():
             break
     for i in utils.get_ids_with_status("done"):
         print("\nJobID {} Status: done.\n".format(i))
-        job_sshfs_dir = "{}{}/".format(media_url, str(i).replace("-", "_"))
+        job_sshfs_dir = "{}{}/".format(path_settings.upload_path, str(i).replace("-", "_"))
         if utils.isdone(job_sshfs_dir, filename='*zip'):
             utils.remove_except(job_sshfs_dir, '*zip', safety=False)
             utils.change_status(i, 'closed')
 
 
-schedule.every(interval).seconds.do(job)
+schedule.every(hpc_settings.scheduler_interval).seconds.do(job)
 
 
 def main():
