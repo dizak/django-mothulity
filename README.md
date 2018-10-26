@@ -14,23 +14,19 @@ django-mothulity stores its settings in the database - there is no need for any 
 
 These instructions are compliant to [this tutorial at DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-18-04) but with the standard SQL database. Neverthless, is should work with any database backend.
 
-1. Setup the production NGINX server and the Gunicorn WSGI as indicated in the [DigitalOcean tutorial](https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-18-04).
+1. Setup the production NGINX server and the Gunicorn WSGI as indicated in the [DigitalOcean tutorial](https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-18-04). Working in the virtual environment, created during the server setup, follow the instructions below.
 
-1. Install ```django-mothulity``` to the virtual environment created during the server setup:
+1. ```pip install django-mothulity-*.tar.gz``` - the project will most probably NOT be distributed with the PyPI.
 
-  1. ```pip install numpy``` - one the packages requires ```numpy``` to be preinstalled but seemingly does not indicate it.
+1. Add ```'django.contrib.sites',``` and ```'mothulity',``` to ```<name_of_project>/settings.py INSTALLED_APPS```.
 
-  1. ```pip install -r requirements.txt```.
+1. It is assumed that ```'localhost'``` and ```'<your.domain.com>'``` are in the ```<name_of_project>/settings.py ALLOWED_HOSTS``` already. If not - add it.
 
-  1. ```pip install django-mothulity-*.tar.gz``` - the project will most probably NOT be distributed.
+1. ```python manage.py test mothulity```. - check if everything is all right.
 
-1. Add ```'django.contrib.sites',``` and ```'mothulity,'``` to ```<name_of_project>/settings.py INSTALLED_APPS```.
+1. ```python manage.py createsuperuser``` - create the Admin user and the Admin Panel.
 
-1. It is assumed that ```'localhost'``` and ```'<your.domain.com>'``` is in the ```<name_of_project>/settings.py ALLOWED_HOSTS``` already. If not - add it.
-
-1. ```python manage.py tests```. Check if everything is all right.
-
-1. ```python manage.py createsuperuser```.
+1. ```python manage.py makemigrations && python manage.py migrate``` - setup the database.
 
 1. In the Admin Panel:
 
