@@ -10,29 +10,35 @@ The main principle is to:
 
 django-mothulity stores its settings in the database - there is no need for any modification in the code (including the paths, scheduler and HPC settings) once it is deployed. The settings are bound to the domain name other than ```localhost``` and specified in ```<name_of_project>/settings.py ALLOWED_HOSTS```. Once this is specified, these settings must specified in the Admin Panel. This solution does NOT allow for using more than domain name - the settings will always bound to first object from the ```ALLOWED_HOSTS``` other than ```localhost```.
 
-### Installation for Production (virtual environment is advised, as always)
+### Installation for Production - NGINX and Gunicorn (virtual environment is advised, as always)
 
-1. ```pip install numpy```.
+These instructions are compliant to [this tutorial at DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-18-04) but with the standard SQL database. Neverthless, is should work with any database backend.
 
-1. ```pip install -r requirements.txt```.
+1. Setup the production NGINX server and the Gunicorn WSGI as indicated in the [DigitalOcean tutorial](https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-18-04).
 
-1. ```pip install django-mothulity-*.tar.gz``` - the project will most probably NOT be distributed.
+1. Install ```django-mothulity``` to the virtual environment created during the server setup:
 
-1. ```django-admin startproject <name_of_project>```.
+  1. ```pip install numpy``` - one the packages requires ```numpy``` to be preinstalled but seemingly does not indicate it.
+
+  1. ```pip install -r requirements.txt```.
+
+  1. ```pip install django-mothulity-*.tar.gz``` - the project will most probably NOT be distributed.
 
 1. Add ```'django.contrib.sites',``` and ```'mothulity,'``` to ```<name_of_project>/settings.py INSTALLED_APPS```.
 
-1. Add ```'localhost'``` and ```'<your.domain.com>'``` to ```<name_of_project>/settings.py ALLOWED_HOSTS```.
+1. It is assumed that ```'localhost'``` and ```'<your.domain.com>'``` is in the ```<name_of_project>/settings.py ALLOWED_HOSTS``` already. If not - add it.
 
-1. ```python manage.py tests```. You can continue if all the tests are passed.
+1. ```python manage.py tests```. Check if everything is all right.
 
-1. ```python manage.py createsuperuser```
+1. ```python manage.py createsuperuser```.
 
 1. In the Admin Panel:
 
   - Add <your.domain.com> to Sites.
 
   - Add Path settings and Hpc settings. The default ones should be OK.
+
+Updates of the ```django-mothulity``` app should require nothing more than ```pip install --upgrade django-mothulity-*.tar.gz```.
 
 ### Installation for Development
 
@@ -45,7 +51,7 @@ django-mothulity stores its settings in the database - there is no need for any 
 
 1. Add ```'django.contrib.sites',``` and ```mothulity.apps.MothulityConfig``` to ```<name_of_project>/<name_of_project>/settings.py INSTALLED_APPS``` list.
 
-1. Add ```'localhost'``` and ```'<your.domain.com>'``` to ```<name_of_project>/settings.py ALLOWED_HOSTS```.
+1. Add ```'localhost'``` and ```'<your.domain.com>'``` to ```<name_of_project>/settings.py ALLOWED_HOSTS``` - it is needed for the Path Settings and HPC Settings which are bound to the Site's domain and name. Path Settings and HPC Settings work with only one domain name, other that localhost and are independent of the Site's ID. There is no need for adding the ```SITE_ID``` variable to the ```<name_of_project>/<name_of_project>/settings.py```. See [this documentation](https://docs.djangoproject.com/pl/2.1/ref/contrib/sites/) for more details about the Django's Site framework.
 
 1. Add ```from django.conf.urls import include, url``` to ```<name_of_project>/<name_of_project>/urls.py```.
 
@@ -71,6 +77,6 @@ django-mothulity stores its settings in the database - there is no need for any 
 
 ### Requirements
 
-SSH keys exchanged with the computing cluster.
-Working directory used by ```MEDIA_URL``` and ```HEADNODE_PREFIX_URL``` mounted on the web-server, eg
-with ```sshfs```.
+- SSH keys exchanged with the computing cluster.
+
+- The same directory mounted at the Web-Server and the HPC. Paths set-up with the ```PathSettings``` available at the Admin Panel.
