@@ -233,8 +233,8 @@ class ViewsResponseTests(TestCase):
         site.save()
         path_settings = models.PathSettings(
             site=site,
-            upload_path='/home/foobar/',
-            hpc_prefix_path='/home/foobar/',
+            upload_path='/tmp/',
+            hpc_prefix_path='/tmp/',
         )
         path_settings.save()
         hpc_settings = models.HPCSettings(
