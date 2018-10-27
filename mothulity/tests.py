@@ -319,11 +319,18 @@ class ViewsResponseTests(TestCase):
                     follow=True,
                 )
         self.assertEqual(response.status_code, 200)
-        # print(os.listdir('{}{}'.format(path_settings.upload_path, self.test_job_id.replace('-', '_'))))
+        # this below should assertRaises and this test should shout that the remote dir is not mounted.
+        self.assertContains(response, views.upload_errors['mothulity_fc'])
+        # self.test_good_uploaded_files = os.listdir(
+        #     '{}{}'.format(
+        #         path_settings.upload_path, self.test_job_id.replace('-', '_')
+        #         )
+        #     )
         # self.assertEqual(
         #         sorted(os.listdir(path_settings.upload_path)),
         #         [self.ref_single_file_name, self.ref_paired_fastq_file_name]
         # )
+        # self.assertContains(response, self.ref_submit_no_data_h2)
 
     def test_submit_no_data(self):
         response = self.client.post(
