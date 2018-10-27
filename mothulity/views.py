@@ -143,12 +143,16 @@ def submit(request,
 def status(request,
            job):
     job = get_object_or_404(JobID, job_id=job)
+    site = Site.objects.get(
+        domain=[i for i in settings.ALLOWED_HOSTS if i != 'localhost'][0]
+        )
+    hpc_settings = site.hpcsettings
     return render(request,
                   "mothulity/status.html.jj2",
                   {"articles": Article.objects.all(),
                    "submissiondata": job.submissiondata,
                    "jobstatus": job.jobstatus,
-                   "max_retry": settings.MAX_RETRY})
+                   "max_retry": hpc_settings.retry_maximum_number})
 
 
 def wiki(request,
