@@ -291,6 +291,40 @@ class ViewsResponseTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.ref_index_h1)
 
+    def test_single_file_upload(self):
+        with open(self.ref_single_file_name) as fin:
+            response = self.client.post(
+                reverse("mothulity:index"),
+                {'file_field': fin}
+            )
+        self.assertContains(response, views.upload_errors['uneven'])
+
+    def test_bad_files_upload(self):
+        with open(self.ref_not_fastq_R1_file_name) as fin_1:
+            with open(self.ref_not_fastq_R2_file_name) as fin_2:
+                response = self.client.post(
+                    reverse("mothulity:index"),
+                    {'file_field': (fin_1, fin_2)}
+                )
+        self.assertContains(response, views.upload_errors['format'])
+
+    def test_good_files_upload(self):
+        site = models.Site.objects.get(domain=[i for i in settings.ALLOWED_HOSTS if i != 'localhost'][0])
+        path_settings = site.pathsettings
+        with open(self.ref_single_file_name) as fin_1:
+            with open(self.ref_paired_fastq_file_name) as fin_2:
+                response = self.client.post(
+                    reverse("mothulity:index"),
+                    {'file_field': (fin_1, fin_2)},
+                    follow=True,
+                )
+        self.assertEqual(response.status_code, 200)
+        # print(os.listdir('{}{}'.format(path_settings.upload_path, self.test_job_id.replace('-', '_'))))
+        # self.assertEqual(
+        #         sorted(os.listdir(path_settings.upload_path)),
+        #         [self.ref_single_file_name, self.ref_paired_fastq_file_name]
+        # )
+
     def test_submit_no_data(self):
         response = self.client.post(
             reverse('mothulity:submit', args=(self.test_job_id,)),
