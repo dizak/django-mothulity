@@ -273,6 +273,10 @@ class ViewsResponseTests(TestCase):
         submissiondata = models.SubmissionData(job_id=self.j_id,
                                              **self.submission_data_dict)
         submissiondata.save()
+        self.ref_single_file_name = '{}/tests/Mock_S280_L001_R1_001.fastq'.format(base_dir)
+        self.ref_paired_fastq_file_name = '{}/tests/Mock_S280_L001_R2_001.fastq'.format(base_dir)
+        self.ref_not_fastq_R1_file_name = '{}/tests/not_a_fastq_file_R1.fastq'.format(base_dir)
+        self.ref_not_fastq_R2_file_name = '{}/tests/not_a_fastq_file_R2.fastq'.format(base_dir)
         self.ref_index_h1 = 'mothulity - simple tool for facilitating work with mothur'
         self.ref_submit_no_data_h2 = 'Parameters to run mothulity'
         self.ref_submit_data_submitted_h1 = 'Thank you, your data has been submitted!'
