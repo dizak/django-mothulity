@@ -11,6 +11,11 @@ from . import utils
 import uuid
 import subprocess as sp
 
+upload_errors = {
+    'uneven': 'Sorry, it seems you uploaded an uneven number of files...',
+    'mothulity_fc': 'Sorry, it seems there is something wrong with your file names...',
+    'format': 'Sorry, it seems you uploaded something else than FASTQ file...'
+}
 
 def index(request,
           seqs_limit=900000):
@@ -31,11 +36,6 @@ def index(request,
     """
     site = Site.objects.get(domain=[i for i in settings.ALLOWED_HOSTS if i != 'localhost'][0])
     path_settings = site.pathsettings
-    upload_errors = {
-        'uneven': 'Sorry, it seems you uploaded an uneven number of files...',
-        'mothulity_fc': 'Sorry, it seems there is something wrong with your file names...',
-        'format': 'Sorry, it seems you uploaded something else than FASTQ file...'
-    }
     if request.method == "POST":
         form = FileFieldForm(request.POST,
                              request.FILES)
