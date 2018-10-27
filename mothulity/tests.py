@@ -224,7 +224,6 @@ class ViewsResponseTests(TestCase):
         urls_list: list of str
             List urls postfixes to be tested by django's test client.
         """
-        self.urls_list = ["index"]
         self.settings_domain = [
             i for i in settings.ALLOWED_HOSTS if i != 'localhost'
         ][0]
@@ -238,15 +237,78 @@ class ViewsResponseTests(TestCase):
             hpc_prefix_path='/home/foobar/',
         )
         path_settings.save()
+        hpc_settings = models.HPCSettings(
+            site=site,
+            free_Ns_minimum_number=20,
+            free_PHIs_minimum_number=5,
+            retry_maximum_number=1,
+            scheduler_interval=300,
+        )
+        hpc_settings.save()
+        self.test_job_id = str(uuid.uuid4())
+        self.submission_data_dict = {"job_name": "test-job",
+                                     "notify_email": "test@mail.com",
+                                     "max_ambig": 0,
+                                     "max_homop": 8,
+                                     # "min_length": 100,
+                                     # "max_length": 200,
+                                     "min_overlap": 10,
+                                     "screen_criteria": 95,
+                                     "chop_length": 250,
+                                     "precluster_diffs": 2,
+                                     "classify_seqs_cutoff": 80,
+                                     "amplicon_type": "16S"}
+        self.test_seqs_count = 42
+        self.test_job_status = "pending"
+        self.test_submission_time = timezone.now()
+        self.j_id = models.JobID(job_id=self.test_job_id)
+        self.j_id.save()
+        stats = models.SeqsStats(job_id=self.j_id,
+                                 seqs_count=self.test_seqs_count)
+        stats.save()
+        status = models.JobStatus(job_id=self.j_id,
+                                  job_status=self.test_job_status,
+                                  submission_time=self.test_submission_time)
+        status.save()
+        submissiondata = models.SubmissionData(job_id=self.j_id,
+                                             **self.submission_data_dict)
+        submissiondata.save()
+        self.ref_index_h1 = 'mothulity - simple tool for facilitating work with mothur'
+        self.ref_submit_no_data_h2 = 'Parameters to run mothulity'
+        self.ref_submit_data_submitted_h1 = 'Thank you, your data has been submitted!'
+        self.ref_status_h2 = 'Your job is {}'.format(self.test_job_status)
+        self.ref_status_p = 'It means it is waiting for resources allocation on the computing cluster.'
 
-    def test_response_code(self):
+    def test_index_response_code(self):
         """
         Tests whether response code of available urls equals <200>.
         """
-        for url in self.urls_list:
-            response = self.client.get(reverse("mothulity:{}".format(url)))
-            self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse("mothulity:index"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.ref_index_h1)
 
+    def test_submit_no_data(self):
+        response = self.client.post(
+            reverse('mothulity:submit', args=(self.test_job_id,)),
+            )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.ref_submit_no_data_h2)
+
+    def test_submit_data_submitted(self):
+        response = self.client.post(
+            reverse('mothulity:submit', args=(self.test_job_id,)),
+            data=self.submission_data_dict,
+            )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.ref_submit_data_submitted_h1)
+
+    def test_status_response_code(self):
+        response = self.client.get(
+            reverse('mothulity:status', args=(self.test_job_id,))
+            )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.ref_status_h2)
+        self.assertContains(response, self.ref_status_p)
 
 class ModelsTest(TestCase):
     """
