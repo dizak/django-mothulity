@@ -72,7 +72,7 @@ def index(request,
                                   "mothulity/index.html.jj2",
                                   {"articles": Article.objects.all(),
                                    "form": form,
-                                   "upload_error": upload_errors['file_format']})
+                                   "upload_error": upload_errors['format']})
             try:
                 utils.ssh_cmd('mothulity_fc {}'.format(headnode_dir))
             except:
