@@ -14,6 +14,8 @@ from random import randint
 from mothulity import views, models, forms, utils
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
+hostname_production = 'xe-mothulity-dizak'
+hostname_development = 'bender'
 
 class UtilsTests(TestCase):
     """
@@ -321,7 +323,7 @@ class ViewsResponseTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, views.upload_errors['mothulity_fc'])
 
-    @unittest.skipUnless(socket.gethostname() == 'xe-mothulity-dizak', 'Paths supposed to work on the production machine.')
+    @unittest.skipUnless(socket.gethostname() == hostname_production, 'Paths supposed to work on the production machine.')
     def test_good_files_upload_remote_dir_mounted(self):
         site = models.Site.objects.get(domain=self.settings_domain)
         path_settings = site.pathsettings
@@ -337,6 +339,25 @@ class ViewsResponseTests(TestCase):
                 )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.ref_submit_no_data_h2)
+        print(response.content)
+
+    @unittest.skipUnless(socket.gethostname() == hostname_development, 'Paths supposed to work on the development machine.')
+    def test_good_files_upload_remote_dir_mounted(self):
+        site = models.Site.objects.get(domain=self.settings_domain)
+        path_settings = site.pathsettings
+        path_settings.upload_path='/mnt/headnode/data/django/'
+        path_settings.hpc_prefix_path='/home/dizak/data/django/'
+        path_settings.save()
+        with open(self.ref_single_file_name) as fin_1:
+            with open(self.ref_paired_fastq_file_name) as fin_2:
+                response = self.client.post(
+                    reverse("mothulity:index"),
+                    {'file_field': (fin_1, fin_2)},
+                    follow=True,
+                )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.ref_submit_no_data_h2)
+        print(response.content)
 
 
     def test_submit_no_data(self):
