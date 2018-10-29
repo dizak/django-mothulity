@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from django.test import TestCase
+import unittest
 from django.urls import reverse
 from django.conf import settings
 from django.utils import timezone
+import socket
 import pytz
 from io import BytesIO
 import os
@@ -308,9 +310,7 @@ class ViewsResponseTests(TestCase):
                 )
         self.assertContains(response, views.upload_errors['format'])
 
-    def test_good_files_upload(self):
-        site = models.Site.objects.get(domain=[i for i in settings.ALLOWED_HOSTS if i != 'localhost'][0])
-        path_settings = site.pathsettings
+    def test_good_files_upload_no_remote_dir_mounted(self):
         with open(self.ref_single_file_name) as fin_1:
             with open(self.ref_paired_fastq_file_name) as fin_2:
                 response = self.client.post(
@@ -319,18 +319,25 @@ class ViewsResponseTests(TestCase):
                     follow=True,
                 )
         self.assertEqual(response.status_code, 200)
-        # this below should assertRaises and this test should shout that the remote dir is not mounted.
         self.assertContains(response, views.upload_errors['mothulity_fc'])
-        # self.test_good_uploaded_files = os.listdir(
-        #     '{}{}'.format(
-        #         path_settings.upload_path, self.test_job_id.replace('-', '_')
-        #         )
-        #     )
-        # self.assertEqual(
-        #         sorted(os.listdir(path_settings.upload_path)),
-        #         [self.ref_single_file_name, self.ref_paired_fastq_file_name]
-        # )
-        # self.assertContains(response, self.ref_submit_no_data_h2)
+
+    @unittest.skipUnless(socket.gethostname() == 'xe-mothulity-dizak', 'Paths supposed to work on the production machine.')
+    def test_good_files_upload_remote_dir_mounted(self):
+        site = models.Site.objects.get(domain=self.settings_domain)
+        path_settings = site.pathsettings
+        path_settings.upload_path='/mnt/mothulity_HPC/jobs/'
+        path_settings.hpc_prefix_path='/home/mothulity/jobs/'
+        path_settings.save()
+        with open(self.ref_single_file_name) as fin_1:
+            with open(self.ref_paired_fastq_file_name) as fin_2:
+                response = self.client.post(
+                    reverse("mothulity:index"),
+                    {'file_field': (fin_1, fin_2)},
+                    follow=True,
+                )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.ref_submit_no_data_h2)
+
 
     def test_submit_no_data(self):
         response = self.client.post(
