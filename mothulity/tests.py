@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from django.test import TestCase
+import unittest
 from django.urls import reverse
 from django.conf import settings
 from django.utils import timezone
+import socket
 import pytz
 from io import BytesIO
 import os
@@ -12,6 +14,8 @@ from random import randint
 from mothulity import views, models, forms, utils
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
+hostname_production = 'xe-mothulity-dizak'
+hostname_development = 'bender'
 
 class UtilsTests(TestCase):
     """
@@ -233,8 +237,8 @@ class ViewsResponseTests(TestCase):
         site.save()
         path_settings = models.PathSettings(
             site=site,
-            upload_path='/home/foobar/',
-            hpc_prefix_path='/home/foobar/',
+            upload_path='/tmp/',
+            hpc_prefix_path='/tmp/',
         )
         path_settings.save()
         hpc_settings = models.HPCSettings(
@@ -273,6 +277,10 @@ class ViewsResponseTests(TestCase):
         submissiondata = models.SubmissionData(job_id=self.j_id,
                                              **self.submission_data_dict)
         submissiondata.save()
+        self.ref_single_file_name = '{}/tests/Mock_S280_L001_R1_001.fastq'.format(base_dir)
+        self.ref_paired_fastq_file_name = '{}/tests/Mock_S280_L001_R2_001.fastq'.format(base_dir)
+        self.ref_not_fastq_R1_file_name = '{}/tests/not_a_fastq_file_R1.fastq'.format(base_dir)
+        self.ref_not_fastq_R2_file_name = '{}/tests/not_a_fastq_file_R2.fastq'.format(base_dir)
         self.ref_index_h1 = 'mothulity - simple tool for facilitating work with mothur'
         self.ref_submit_no_data_h2 = 'Parameters to run mothulity'
         self.ref_submit_data_submitted_h1 = 'Thank you, your data has been submitted!'
@@ -286,6 +294,71 @@ class ViewsResponseTests(TestCase):
         response = self.client.get(reverse("mothulity:index"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.ref_index_h1)
+
+    def test_single_file_upload(self):
+        with open(self.ref_single_file_name) as fin:
+            response = self.client.post(
+                reverse("mothulity:index"),
+                {'file_field': fin}
+            )
+        self.assertContains(response, views.upload_errors['uneven'])
+
+    def test_bad_files_upload(self):
+        with open(self.ref_not_fastq_R1_file_name) as fin_1:
+            with open(self.ref_not_fastq_R2_file_name) as fin_2:
+                response = self.client.post(
+                    reverse("mothulity:index"),
+                    {'file_field': (fin_1, fin_2)}
+                )
+        self.assertContains(response, views.upload_errors['format'])
+
+    def test_good_files_upload_no_remote_dir_mounted(self):
+        with open(self.ref_single_file_name) as fin_1:
+            with open(self.ref_paired_fastq_file_name) as fin_2:
+                response = self.client.post(
+                    reverse("mothulity:index"),
+                    {'file_field': (fin_1, fin_2)},
+                    follow=True,
+                )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, views.upload_errors['mothulity_fc'])
+
+    @unittest.skipUnless(socket.gethostname() == hostname_production, 'Paths supposed to work on the production machine.')
+    def test_good_files_upload_remote_dir_mounted(self):
+        site = models.Site.objects.get(domain=self.settings_domain)
+        path_settings = site.pathsettings
+        path_settings.upload_path='/mnt/mothulity_HPC/jobs/'
+        path_settings.hpc_prefix_path='/home/mothulity/jobs/'
+        path_settings.save()
+        with open(self.ref_single_file_name) as fin_1:
+            with open(self.ref_paired_fastq_file_name) as fin_2:
+                response = self.client.post(
+                    reverse("mothulity:index"),
+                    {'file_field': (fin_1, fin_2)},
+                    follow=True,
+                )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.ref_submit_no_data_h2)
+        print(response.content)
+
+    @unittest.skipUnless(socket.gethostname() == hostname_development, 'Paths supposed to work on the development machine.')
+    def test_good_files_upload_remote_dir_mounted(self):
+        site = models.Site.objects.get(domain=self.settings_domain)
+        path_settings = site.pathsettings
+        path_settings.upload_path='/mnt/headnode/data/django/'
+        path_settings.hpc_prefix_path='/home/dizak/data/django/'
+        path_settings.save()
+        with open(self.ref_single_file_name) as fin_1:
+            with open(self.ref_paired_fastq_file_name) as fin_2:
+                response = self.client.post(
+                    reverse("mothulity:index"),
+                    {'file_field': (fin_1, fin_2)},
+                    follow=True,
+                )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.ref_submit_no_data_h2)
+        print(response.content)
+
 
     def test_submit_no_data(self):
         response = self.client.post(
