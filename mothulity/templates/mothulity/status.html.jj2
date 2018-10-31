@@ -3,11 +3,11 @@
   Mothulity - Status
 {% endblock %}
 {% block content %}
-  <article class="w3-container w3-margin w3-card-8 w3-white">
-    <h1>Hello from status page!</h1>
+  <article class="w3-container w3-round-xlarge w3-margin w3-card-8 w3-white">
+    <h1>Status of {{ submissiondata.job_name }}</h1>
   </article>
-  <article class="w3-container w3-margin w3-card-8 w3-white">
-    <h2>Your job is {{ jobstatus.job_status }}</h2>
+  <article class="w3-container w3-round-xlarge w3-margin w3-card-8 w3-white">
+    <h2>{{ submissiondata.job_name }} is {{ jobstatus.job_status }}</h2>
     {% if jobstatus.job_status == "pending" %}
       <p>It means it is waiting for resources allocation on the computing cluster.</p>
     {% elif jobstatus.job_status == "submitted" %}
@@ -20,7 +20,7 @@
         <li>problems with the sequences themselves</li>
       </ul>
       <p>It will NOT be resubmitted automatically again.</p>
-    {% elif jobstatus.job_status == "done" %}
+    {% elif jobstatus.job_status == "closed" %}
       <article class="w3-container w3-margin w3-card-8 w3-white">
         <p>Your results has been sent to {{ submissiondata.notify_email }}</p>
       </article>
