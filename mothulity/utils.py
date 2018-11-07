@@ -361,7 +361,8 @@ def get_retry(job_id):
 
 
 def queue_submit(job_id,
-                 headnode_prefix,
+                 machine,
+                 hpc_prefix,
                  sbatch_success="Submitted batch job"):
     """
     Retrieves required data from models by Job ID, renders mothulity command,
@@ -381,7 +382,7 @@ def queue_submit(job_id,
     job = models.JobID.objects.get(job_id=job_id)
     seqs_count = job.seqsstats.seqs_count
     sub_data = model_to_dict(job.submissiondata)
-    job_id_dir = '{}{}/'.format(headnode_prefix, str(job_id).replace('-', '_'))
+    job_id_dir = '{}{}/'.format(hpc_prefix, str(job_id).replace('-', '_'))
     # if seqs_count > 500000:
     #     sub_data["resources"] = "phi"
     # else:
@@ -392,7 +393,10 @@ def queue_submit(job_id,
                                      moth_opts=sub_data,
                                      pop_elems=["job_id",
                                                 "amplicon_type"])
-    sbatch_out = ssh_cmd(moth_cmd)
+    sbatch_out = ssh_cmd(
+        cmd=moth_cmd,
+        machine=machine,
+        )
     if sbatch_success in sbatch_out:
         add_slurm_id(job_id=job_id,
                      slurm_id=int(sbatch_out.split(" ")[-1]))
@@ -489,7 +493,8 @@ def add_retry(job_id,
 
 
 def isrunning(job_id,
-              status_model=models.JobStatus):
+              machine,
+              status_model=models.JobStatus,):
     """
     Check if job is actually running on the computing cluster.
 
@@ -506,7 +511,7 @@ def isrunning(job_id,
         True is submitted ID has <R> state in squeue output.
     """
     slurm_id = get_slurm_id(job_id)
-    if parse_squeue(ssh_cmd("squeue"), slurm_id, "ST") == "R":
+    if parse_squeue(ssh_cmd(cmd="squeue", machine=machine), slurm_id, "ST") == "R":
         return True
     else:
         return False
