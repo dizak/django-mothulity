@@ -1,10 +1,12 @@
 import subprocess as sp
 from glob import glob
 import subprocess as sp
+import os
 from skbio.io import sniff
 import Bio.SeqIO as sio
 import math
 from fnmatch import fnmatch
+import pytz
 import django
 from django.conf import settings
 from django.shortcuts import get_object_or_404
@@ -417,12 +419,16 @@ def remove_except(directory,
         Directory path from which the unwanted files will be removed.
     pattern: str
         Files ending with this will NOT be removed from the directory.
+        If <None> or <False> - everything will be removed.
     """
     cmd = {True: 'ls', False: 'rm'}
     if not directory.endswith('/'):
         directory = directory + '/'
     files = glob('{}*'.format(directory))
-    files_to_remove = [i for i in files if not fnmatch(i, pattern)]
+    if not pattern:
+        files_to_remove = files
+    else:
+        files_to_remove = [i for i in files if not fnmatch(i, pattern)]
     try:
         return sp.check_output(
             '{} {}'.format(cmd[safety], ' '.join(files_to_remove)),
@@ -541,3 +547,47 @@ def isdone(directory,
         return True
     except Exception as e:
         return False
+
+
+def isstale(
+    input_file,
+    expiry_time,
+        ):
+    """
+    Check if file is older than given amount of time in seconds.
+    """
+    file_time =  pytz.datetime.datetime.fromtimestamp(os.path.getmtime(input_file))
+    if file_time + pytz.datetime.timedelta(seconds=expiry_time) < pytz.datetime.datetime.now():
+        return True
+    else:
+        return False
+
+
+def get_dirs_without_ids(
+    input_dir,
+    job_model=models.JobID
+    ):
+    """
+    Return list of directories which does not posses the JobID.
+
+    Parameters
+    -------
+    input_dir: path
+        Input path.
+    status_model: django.models.Model, default JobID
+        Django model to use.
+
+    Returns
+    -------
+    list of str
+        List of absolute paths to directories without JobID.
+    """
+    input_dir_abs = os.path.abspath(input_dir)
+    ids = [i.job_id for i in job_model.objects.all()]
+    files_no_job_id = [i for i in os.listdir(input_dir_abs) if i not in ids]
+    dirs_no_job_id = [
+        i
+        for i in ['{}/{}/'.format(input_dir_abs, ii) for ii in files_no_job_id]
+        if os.path.isdir(i)
+        ]
+    return dirs_no_job_id

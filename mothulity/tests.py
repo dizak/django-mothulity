@@ -7,6 +7,7 @@ from django.conf import settings
 from django.utils import timezone
 import socket
 import pytz
+from time import sleep
 from io import BytesIO
 import os
 import uuid
@@ -37,6 +38,8 @@ class UtilsTests(TestCase):
             Number of nodes idle in queue long.
         """
         self.test_job_id = str(uuid.uuid4())
+        self.j_id = models.JobID(job_id=self.test_job_id)
+        self.j_id.save()
         self.fastq_file = "{}/tests/Mock_S280_L001_R1_001.fastq".format(base_dir)
         self.summ_file = "{}/tests/mothur.job.trim.contigs.summary".format(base_dir)
         self.machine = "headnode"
@@ -72,7 +75,9 @@ class UtilsTests(TestCase):
             'amplicon_type': '16S',
         }
         self.test_job_dir = '{}/tests/{}/'.format(base_dir, self.test_job_id)
+        self.test_no_job_dir = '{}/tests/{}/'.format(base_dir, str(uuid.uuid4()))
         os.system('mkdir {}'.format(self.test_job_dir))
+        os.system('mkdir {}'.format(self.test_no_job_dir))
         os.system('touch {0}1.fastq {0}2.fastq {0}mothur.job.sh {0}analysis_mothur.job.zip'.format(self.test_job_dir))
         self.ref_files_to_spare = ['analysis_mothur.job.zip']
 
@@ -81,6 +86,7 @@ class UtilsTests(TestCase):
         Distroys tests left-overs.
         """
         os.system('rm -r {}'.format(self.test_job_dir))
+        os.system('rm -r {}'.format(self.test_no_job_dir))
 
     def test_sniff_true(self):
         """
@@ -207,12 +213,46 @@ class UtilsTests(TestCase):
             self.ref_files_to_spare
             )
 
+    def test_remove_except_no_exceptions(self):
+        """
+        Tests if everything is removed if there is nothing spare on purpose.
+        """
+        utils.remove_except(self.test_job_dir, None, safety=False)
+        self.test_job_dir_content = os.listdir(self.test_job_dir)
+        self.assertEqual(
+            self.test_job_dir_content,
+            [],
+            )
+
     def test_isdone(self):
         """
         Tests if returns proper value.
         """
         self.assertTrue(utils.isdone(self.test_job_dir))
         self.assertFalse(utils.isdone(self.test_job_dir, '*foobar'))
+
+    def test_isstale(self):
+        """
+        Tests if utils.isstale return proper value.
+        """
+        sleep(5)
+        self.assertEqual(
+            utils.isstale('{}1.fastq'.format(self.test_job_dir), 3),
+            True,
+            )
+        self.assertEqual(
+            utils.isstale('{}1.fastq'.format(self.test_job_dir), 1200),
+            False,
+            )
+
+    def test_get_dirs_without_ids(self):
+        """
+        Test if utils.get_dirs_without_ids returns proper value.
+        """
+        self.assertEqual(
+            utils.get_dirs_without_ids('{}/tests/'.format(base_dir), job_model=models.JobID),
+            [self.test_no_job_dir]
+            )
 
 
 class ViewsResponseTests(TestCase):
