@@ -4,7 +4,7 @@ from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils import timezone
-from mothulity.forms import FileFieldForm, OptionsForm
+from mothulity.forms import FileFieldForm, OptionsForm, ResendResultsEMailForm
 from mothulity.models import *
 from mothulity.utils import isdone
 from . import utils
@@ -150,13 +150,37 @@ def status(request,
     site = Site.objects.get(
         domain=[i for i in settings.ALLOWED_HOSTS if i != 'localhost'][0]
         )
+    path_settings = site.pathsettings
+    web_server_settings = site.webserversettings
     hpc_settings = site.hpcsettings
+    hpc_dir = "{}{}/".format(
+        path_settings.hpc_path,
+        str(job.job_id).replace("-", "_"),
+    )
+    if request.method == 'POST':
+        form = ResendResultsEMailForm(request.POST)
+        if form.is_valid():
+            form_data = form.cleaned_data
+            print(form_data)
+            utils.ssh_cmd(
+                cmd='''"cd {0} && headnode_notifier.py {1} --subject {2} --attach analysis_{2}.zip"'''.format(
+                    hpc_dir,
+                    form_data['email_address'],
+                    job.submissiondata.job_name,
+                ),
+                machine=hpc_settings.hpc_name,
+            )
+    else:
+        form = ResendResultsEMailForm()
     return render(request,
                   "mothulity/status.html.jj2",
-                  {"articles": Article.objects.all(),
-                   "submissiondata": job.submissiondata,
-                   "jobstatus": job.jobstatus,
-                   "max_retry": hpc_settings.retry_maximum_number})
+                  {
+                      "articles": Article.objects.all(),
+                       "submissiondata": job.submissiondata,
+                       "jobstatus": job.jobstatus,
+                       "max_retry": hpc_settings.retry_maximum_number,
+                       'form': form,
+                   })
 
 
 def wiki(request,
