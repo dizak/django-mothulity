@@ -5,22 +5,13 @@ from django.contrib import admin
 from mothulity.models import *
 
 
-class SeqsStatsAdmin(admin.ModelAdmin):
-    list_display = ("seqs_count",)
-
-
 class SubmissionDataAdmin(admin.ModelAdmin):
-    list_display = ("job_name",
-                    "notify_email",
-                    "amplicon_type")
-
-
-class JobStatusAdmin(admin.ModelAdmin):
-    list_display = ("job_id",
-                    "job_status",
-                    "slurm_id",
-                    "retry",
-                    "submission_time")
+    list_display = (
+        'job_id',
+        "job_name",
+        "notify_email",
+        "amplicon_type",
+    )
 
 
 class ArticleAdmin(admin.ModelAdmin):
@@ -40,9 +31,7 @@ class HPCSettingsAdmin(admin.ModelAdmin):
 
 
 admin.site.register(JobID)
-admin.site.register(SeqsStats, SeqsStatsAdmin)
 admin.site.register(SubmissionData, SubmissionDataAdmin)
-admin.site.register(JobStatus, JobStatusAdmin)
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(PathSettings, PathSettingsAdmin)
 admin.site.register(WebServerSettings, WebServerSettingsAdmin)
